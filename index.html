@@ -904,34 +904,32 @@
 
  #contact .contact-panel-wrap {
  position: relative;
- padding-top: 2.75rem;
  }
 
  #contact .contact-badge {
- position: absolute;
- top: 0;
- left: 0;
+ position: relative;
  z-index: 2;
  display: inline-block;
  transform: rotate(-3deg);
  transform-origin: left center;
- max-width: calc(100% - 0.5rem);
- margin: 0;
+ max-width: 100%;
+ margin: 0 0 1.25rem;
  }
 
  #contact .contact-badge span {
  display: block;
  font-size: 0.875rem;
  line-height: 1.2;
+ white-space: nowrap;
+ }
+
+ #contact #contact-panel {
+ margin-top: 0;
  }
 
  @media (min-width: 640px) {
- #contact .contact-panel-wrap {
- padding-top: 3.25rem;
- }
-
  #contact .contact-badge {
- left: -0.5rem;
+ margin-bottom: 1.5rem;
  }
 
  #contact .contact-badge span {
@@ -940,12 +938,9 @@
  }
 
  @media (min-width: 768px) {
- #contact .contact-panel-wrap {
- padding-top: 3.5rem;
- }
-
  #contact .contact-badge {
- left: -1rem;
+ margin-left: -0.75rem;
+ margin-bottom: 1.75rem;
  }
 
  #contact .contact-badge span {
@@ -3012,7 +3007,7 @@
 
  <section id="contact" data-section-theme="contact" class="py-24 px-4 max-w-5xl mx-auto">
  <div class="contact-panel-wrap relative mt-6 sm:mt-10">
- <div class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard">
+ <div class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard w-fit">
  <span class="font-black">START A PROJECT</span>
  </div>
 
