@@ -902,45 +902,55 @@
  box-shadow: 2px 2px 0 rgba(251, 255, 72, 0.35);
  }
 
+ #contact {
+ overflow: visible;
+ }
+
  #contact .contact-panel-wrap {
  position: relative;
+ overflow: visible;
+ }
+
+ #contact #contact-panel {
+ position: relative;
+ overflow: visible;
  }
 
  #contact .contact-badge {
- position: relative;
- z-index: 2;
+ position: absolute;
+ top: -1.125rem;
+ right: -0.5rem;
+ z-index: 3;
  display: inline-block;
- transform: rotate(-3deg);
- transform-origin: left center;
- max-width: 100%;
- margin: 0 0 1.25rem;
+ transform: rotate(4deg);
+ transform-origin: center center;
+ max-width: min(16rem, calc(100% - 1rem));
+ margin: 0;
  }
 
  #contact .contact-badge span {
  display: block;
- font-size: 0.875rem;
+ font-size: 0.75rem;
  line-height: 1.2;
  white-space: nowrap;
  }
 
- #contact #contact-panel {
- margin-top: 0;
- }
-
  @media (min-width: 640px) {
  #contact .contact-badge {
- margin-bottom: 1.5rem;
+ top: -1.375rem;
+ right: -0.75rem;
  }
 
  #contact .contact-badge span {
- font-size: 1.25rem;
+ font-size: 1.125rem;
  }
  }
 
  @media (min-width: 768px) {
  #contact .contact-badge {
- margin-left: -0.75rem;
- margin-bottom: 1.75rem;
+ top: -1.5rem;
+ right: -1rem;
+ transform: rotate(5deg);
  }
 
  #contact .contact-badge span {
@@ -3006,12 +3016,12 @@
  </section>
 
  <section id="contact" data-section-theme="contact" class="py-24 px-4 max-w-5xl mx-auto">
- <div class="contact-panel-wrap relative mt-6 sm:mt-10">
+ <div class="contact-panel-wrap relative mt-8 sm:mt-12">
+ <div id="contact-panel" class="bg-white border-4 border-black shadow-hard-xl p-5 sm:p-8 md:p-12 relative reveal" tabindex="-1">
  <div class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard w-fit">
  <span class="font-black">START A PROJECT</span>
  </div>
 
- <div id="contact-panel" class="bg-white border-4 border-black shadow-hard-xl p-5 sm:p-8 md:p-12 relative reveal" tabindex="-1">
  <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
  <div>
  <h2 class="text-4xl sm:text-5xl md:text-6xl font-black uppercase mb-6 leading-[0.85] pt-0">Let's<br>Talk<br>Code.</h2>
