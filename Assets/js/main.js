@@ -1,9 +1,41 @@
 (function () {
     'use strict';
 
-    if (window.renderProjectsGrid) window.renderProjectsGrid();
+    if (window.renderProjectsGrid) scheduleProjectsGrid();
+
+    function ensureProjectsGrid() {
+        const grid = document.getElementById('projects-grid');
+        if (!grid || grid.dataset.dynamic !== 'true' || grid.dataset.rendered === 'true') return;
+        grid.dataset.rendered = 'true';
+        window.renderProjectsGrid?.();
+    }
+
+    window.ensureProjectsGrid = ensureProjectsGrid;
+
+    function scheduleProjectsGrid() {
+        const grid = document.getElementById('projects-grid');
+        if (!grid || grid.dataset.dynamic !== 'true' || grid.dataset.rendered === 'true') return;
+
+        if (window.location.hash.slice(1) === 'projects') {
+            ensureProjectsGrid();
+            return;
+        }
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                if (!entries[0]?.isIntersecting) return;
+                observer.disconnect();
+                ensureProjectsGrid();
+            }, { rootMargin: '480px', threshold: 0.01 });
+            observer.observe(grid);
+            return;
+        }
+
+        ensureProjectsGrid();
+    }
 
     const GITHUB_USERNAME = 'YuvisTechPoint';
+    const GH_CACHE_KEY = `gh_user_cache_v1:${GITHUB_USERNAME}`;
     const LEETCODE_USERNAME = 'YuvisTechPoint';
     const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
     const CONSENT_KEY = 'yp_site_consent_v1';
@@ -106,6 +138,53 @@
         fetchLeetCodeBadges();
     }
 
+    function startStatsApisWhenVisible() {
+        if (statsApisStarted) return;
+        const section = document.getElementById('coding-stats');
+        if (!section) {
+            startStatsApis();
+            return;
+        }
+        if (!('IntersectionObserver' in window)) {
+            startStatsApis();
+            return;
+        }
+        const observer = new IntersectionObserver((entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            observer.disconnect();
+            startStatsApis();
+        }, { rootMargin: '240px', threshold: 0.01 });
+        observer.observe(section);
+    }
+
+    function hydrateHeroReposFromCache() {
+        const cached = readCache(GH_CACHE_KEY);
+        if (cached?.data?.public_repos == null) return;
+        const el = document.getElementById('hero-repos-stat');
+        if (el) el.textContent = String(cached.data.public_repos);
+    }
+
+    function prefetchHeroGitHubCount() {
+        if (cacheConsent === 'decline') return;
+        hydrateHeroReposFromCache();
+        const run = () => {
+            fetchGitHubUser().then((data) => {
+                const el = document.getElementById('hero-repos-stat');
+                if (el && data?.public_repos != null) el.textContent = String(data.public_repos);
+            }).catch(() => {});
+        };
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(run, { timeout: 2500 });
+        } else {
+            setTimeout(run, 400);
+        }
+    }
+
+    function bootstrapAfterConsent() {
+        prefetchHeroGitHubCount();
+        startStatsApisWhenVisible();
+    }
+
     function trapFocusIn(container) {
         const focusable = container.querySelectorAll(
             'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'
@@ -169,7 +248,7 @@
         if (choice === 'decline') clearStatsCache();
         applyGtmConsentUpdate(choice);
         resetStatsFetchers();
-        startStatsApis();
+        bootstrapAfterConsent();
         hideCookieConsent();
 
         window.dispatchEvent(new CustomEvent('yp-consent-changed', { detail: { choice } }));
@@ -194,7 +273,7 @@
         if (!banner) {
             if (!cacheConsent) cacheConsent = 'essential';
             applyGtmConsentUpdate(cacheConsent);
-            startStatsApis();
+            bootstrapAfterConsent();
             return;
         }
 
@@ -220,7 +299,7 @@
         if (cacheConsent) {
             hideCookieConsent();
             applyGtmConsentUpdate(cacheConsent);
-            startStatsApis();
+            bootstrapAfterConsent();
             return;
         }
 
@@ -241,7 +320,7 @@
     const CURSOR_INTERACTIVE = '.cursor-hover, a, button, input, textarea, select, label, h1, h2, h3, h4, h5, h6';
     const CURSOR_MAGNIFY_BLOCK = '#profile-flip-card, #cv-modal, #command-palette, #mobile-menu, #mobile-menu-backdrop';
 
-    if (cursor && !prefersReducedMotion && !isTouchDevice && window.innerWidth >= 1024) {
+    if (cursor && !prefersReducedMotion && !isTouchDevice && !navigator.connection?.saveData && window.innerWidth >= 1024) {
         const mirrorHost = cursor.querySelector('.cursor-mirror');
         let cursorExpanded = false;
         let mirrorSources = [];
@@ -261,7 +340,22 @@
             return false;
         }
 
+        const MIRROR_SKIP_CHILDREN = '#section-rail, nav[aria-label="Main navigation"]';
+        const MIRROR_NAV_SOURCE = 'nav[aria-label="Main navigation"] .main-nav-bar';
+
+        const MIRROR_PRESENTATION_PROPS = [
+            'display', 'visibility', 'opacity', 'color', 'background-color',
+            'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+            'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
+            'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+            'box-shadow', 'font-size', 'font-weight', 'font-family', 'line-height', 'letter-spacing',
+            'text-transform', 'white-space', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+            'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'gap',
+            'justify-content', 'align-items', 'flex-direction', 'flex-wrap', 'text-decoration',
+        ];
+
         function getMirrorZIndex(el) {
+            if (el.classList?.contains('mirror-nav-layer') || el.classList?.contains('main-nav-bar')) return 100;
             const style = getComputedStyle(el);
             const parsed = parseInt(style.zIndex, 10);
             if (!Number.isNaN(parsed)) return parsed;
@@ -269,11 +363,42 @@
             return 0;
         }
 
+        function shouldSkipMirrorChild(child) {
+            if (child === cursor || child.tagName === 'SCRIPT' || child.tagName === 'NOSCRIPT') return true;
+            return child.matches?.(MIRROR_SKIP_CHILDREN);
+        }
+
+        function stripMirrorIds(root) {
+            root.removeAttribute('id');
+            root.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+        }
+
+        function syncMirrorPresentation(original, clone) {
+            const origNodes = [original, ...original.querySelectorAll('*')];
+            const cloneNodes = [clone, ...clone.querySelectorAll('*')];
+            origNodes.forEach((orig, index) => {
+                const mirrorNode = cloneNodes[index];
+                if (!mirrorNode) return;
+                const computed = getComputedStyle(orig);
+                mirrorNode.style.display = computed.display;
+                mirrorNode.style.visibility = computed.visibility;
+                mirrorNode.style.opacity = computed.opacity;
+                MIRROR_PRESENTATION_PROPS.forEach((prop) => {
+                    const value = computed.getPropertyValue(prop);
+                    if (value) mirrorNode.style.setProperty(prop, value);
+                });
+            });
+        }
+
+        function getMirrorLayerRect(original) {
+            return original.getBoundingClientRect();
+        }
+
         function syncMirrorLayerPositions() {
             mirrorSources.forEach(({ original, clone }) => {
                 if (!original.isConnected) return;
-                const rect = original.getBoundingClientRect();
-                if (rect.width < 1 && rect.height < 1) {
+                const rect = getMirrorLayerRect(original);
+                if (rect.width < 1 || rect.height < 1) {
                     clone.style.visibility = 'hidden';
                     return;
                 }
@@ -315,17 +440,28 @@
             page.className = 'cursor-mirror-page';
 
             Array.from(document.body.children).forEach((child) => {
-                if (child === cursor || child.tagName === 'SCRIPT' || child.tagName === 'NOSCRIPT') return;
+                if (shouldSkipMirrorChild(child)) return;
                 const clone = child.cloneNode(true);
-                clone.removeAttribute('id');
-                clone.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+                stripMirrorIds(clone);
                 clone.setAttribute('aria-hidden', 'true');
                 clone.style.zIndex = String(getMirrorZIndex(child));
                 page.appendChild(clone);
                 mirrorSources.push({ original: child, clone });
             });
 
+            const navSource = document.querySelector(MIRROR_NAV_SOURCE);
+            if (navSource) {
+                const navClone = navSource.cloneNode(true);
+                stripMirrorIds(navClone);
+                navClone.classList.add('mirror-nav-layer');
+                navClone.setAttribute('aria-hidden', 'true');
+                navClone.style.zIndex = '100';
+                page.appendChild(navClone);
+                mirrorSources.push({ original: navSource, clone: navClone });
+            }
+
             mirrorHost.appendChild(page);
+            mirrorSources.forEach(({ original, clone }) => syncMirrorPresentation(original, clone));
             syncMirrorMedia();
             syncMirrorLayerPositions();
         }
@@ -366,15 +502,21 @@
 
         let lastCursorX = 0;
         let lastCursorY = 0;
+        let cursorFramePending = false;
 
         document.addEventListener('mousemove', (e) => {
             lastCursorX = e.clientX;
             lastCursorY = e.clientY;
-            cursor.style.left = `${e.clientX}px`;
-            cursor.style.top = `${e.clientY}px`;
-            const interactive = shouldMagnifyAt(e.clientX, e.clientY);
-            setCursorExpanded(interactive, e.clientX, e.clientY);
-            if (cursorExpanded) updateViewportMirror(e.clientX, e.clientY, CURSOR_HOVER);
+            if (cursorFramePending) return;
+            cursorFramePending = true;
+            requestAnimationFrame(() => {
+                cursorFramePending = false;
+                cursor.style.left = `${lastCursorX}px`;
+                cursor.style.top = `${lastCursorY}px`;
+                const interactive = shouldMagnifyAt(lastCursorX, lastCursorY);
+                setCursorExpanded(interactive, lastCursorX, lastCursorY);
+                if (cursorExpanded) updateViewportMirror(lastCursorX, lastCursorY, CURSOR_HOVER);
+            });
         }, { passive: true });
 
         let mirrorScrollTicking = false;
@@ -512,6 +654,8 @@
     }
 
     function scrollToSection(id) {
+        if (id === 'projects') window.ensureProjectsGrid?.();
+        if (id === 'reports') window.ensureReportsMarquee?.();
         const section =
             id === 'contact' ? getContactScrollTarget() : document.getElementById(id);
         if (!section) return;
@@ -637,11 +781,20 @@
             }
         });
     }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
+    window.observeReveals = function observeReveals(root) {
+        const scope = root && root.querySelectorAll ? root : document;
+        scope.querySelectorAll('.reveal:not(.active)').forEach((el) => {
+            if (el.dataset.revealObserved === 'true') return;
+            el.dataset.revealObserved = 'true';
+            revealObserver.observe(el);
+        });
+    };
+
+    window.observeReveals(document);
 
     /* --- Project tag filters --- */
     const filterBtns = document.querySelectorAll('.project-filter');
-    const projectArticles = document.querySelectorAll('#projects-grid article[data-tags]');
     filterBtns.forEach((btn) => {
         btn.addEventListener('click', () => {
             const filter = btn.dataset.filter;
@@ -652,7 +805,7 @@
                 b.classList.toggle('text-white', active);
                 b.classList.toggle('bg-white', !active);
             });
-            projectArticles.forEach((article) => {
+            document.querySelectorAll('#projects-grid article[data-tags]').forEach((article) => {
                 const tags = (article.dataset.tags || '').split(' ');
                 article.classList.toggle('project-hidden', filter !== 'all' && !tags.includes(filter));
             });
@@ -685,13 +838,17 @@
         toastTimer = setTimeout(() => toast.classList.remove('visible'), 4000);
     }
 
-    /* --- Portfolio highlights --- */
+    /* --- Portfolio highlights (deferred until #reports is near viewport) --- */
     const SHOW_TESTIMONIALS = false;
     const clientTestimonials = [
         // { from: 'Client Name', quote: 'Real testimonial quote here.' }
     ];
-    const testimonialsMarquee = document.getElementById('testimonials-marquee');
-    if (testimonialsMarquee) {
+
+    function ensureReportsMarquee() {
+        const testimonialsMarquee = document.getElementById('testimonials-marquee');
+        if (!testimonialsMarquee || testimonialsMarquee.dataset.rendered === 'true') return;
+        testimonialsMarquee.dataset.rendered = 'true';
+
         const themes = {
             orange: { bar: 'bg-neo-orange', label: 'text-neo-orange', hover: 'hover:border-neo-orange/50', stars: 'text-neo-orange/60' },
             green: { bar: 'bg-neo-green', label: 'text-neo-green', hover: 'hover:border-neo-green/50', stars: 'text-neo-green/60' },
@@ -709,7 +866,6 @@
             { id: '006', from: 'Hackathon Circuit', quote: '10+ wins including Hack4Bengal S4, HackTropica 2k25, Algo Hacks 2025, and IMI Kolkata CodeCrafter.', theme: themes.green },
             { id: '007', from: 'Patent Office India', quote: 'Granted patent for Smart Health & Nutrition Monitoring Watch (ID: 456407-001, April 2025).', theme: themes.blue }
         ];
-        const stars = '';
         const year = new Date().getFullYear();
         const renderCard = (item) => {
             const t = item.theme;
@@ -725,6 +881,45 @@
         };
         testimonialsMarquee.innerHTML = portfolioLogs.map(renderCard).join('');
     }
+
+    window.ensureReportsMarquee = ensureReportsMarquee;
+
+    function scheduleReportsMarquee() {
+        const section = document.getElementById('reports');
+        const container = document.getElementById('testimonials-marquee');
+        if (!section || !container || container.dataset.rendered === 'true') return;
+
+        if (window.location.hash.slice(1) === 'reports') {
+            ensureReportsMarquee();
+            return;
+        }
+
+        if (!('IntersectionObserver' in window)) {
+            ensureReportsMarquee();
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            if (!entries[0]?.isIntersecting) return;
+            observer.disconnect();
+            ensureReportsMarquee();
+        }, { rootMargin: '320px', threshold: 0.01 });
+        observer.observe(section);
+    }
+
+    scheduleReportsMarquee();
+
+    function pauseOffscreenMarquees() {
+        if (!('IntersectionObserver' in window)) return;
+        document.querySelectorAll('.marquee-container').forEach((el) => {
+            const observer = new IntersectionObserver((entries) => {
+                el.classList.toggle('marquee-offscreen', !entries[0]?.isIntersecting);
+            }, { rootMargin: '64px', threshold: 0 });
+            observer.observe(el);
+        });
+    }
+
+    pauseOffscreenMarquees();
 
     /* --- Clipboard helper --- */
     function copyToClipboard(text, btnId) {
@@ -864,7 +1059,6 @@
     window.handleContactSubmit = submitContactForm;
 
     /* --- GitHub (single API call for stats + badges) --- */
-    const GH_CACHE_KEY = `gh_user_cache_v1:${GITHUB_USERNAME}`;
     const GH_REPOS_CACHE_KEY = `gh_repos_cache_v1:${GITHUB_USERNAME}`;
     let githubReposPromise = null;
 

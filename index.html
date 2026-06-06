@@ -40,8 +40,10 @@
 
  <!-- Theme & Performance -->
  <meta name="theme-color" content="#121212">
+ <link rel="preload" href="Assets/css/main.css" as="style">
+ <link rel="preload" href="Assets/images/Yuvraj%20image.webp" as="image" type="image/webp" fetchpriority="high">
  <link rel="preload"
- href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Space+Grotesk:wght@800&display=swap"
+ href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700;800&display=swap"
  as="style">
 
  <!-- JSON-LD Structured Data for Search Engines -->
@@ -75,17 +77,19 @@
 
  <link href="Assets/css/main.css" rel="stylesheet">
 
- <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-
  <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
  <link rel="dns-prefetch" href="https://api.github.com">
+ <link rel="dns-prefetch" href="https://api.microlink.io">
+ <link
+ href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700;800&display=swap"
+ rel="stylesheet">
+ <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" media="print" onload="this.media='all'">
+ <noscript><link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet"></noscript>
+
  <link rel="icon" type="image/png" href="Assets/images/title_icon.png">
  <link rel="icon" type="image/svg+xml" href="Assets/images/favicon.svg">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link
- href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap"
- rel="stylesheet">
 
  <style>
  /* Base Styles */
@@ -98,6 +102,31 @@
  linear-gradient(to right, #e5e5e5 1px, transparent 1px),
  linear-gradient(to bottom, #e5e5e5 1px, transparent 1px);
  background-size: 40px 40px, 100px 100px, 100px 100px;
+ }
+
+ #skills,
+ #experience,
+ #education,
+ #coding-stats,
+ #intellectual-property,
+ #projects,
+ #reports,
+ #contact,
+ #site-footer {
+ content-visibility: auto;
+ contain-intrinsic-size: auto 720px;
+ }
+
+ @media (max-width: 767px) {
+ .marquee-content,
+ .marquee-content-reverse,
+ .animate-marquee {
+ animation-play-state: paused;
+ }
+
+ .hero-ticker .marquee-content {
+ animation-play-state: running;
+ }
  }
 
  /* Custom Cursor */
@@ -113,31 +142,6 @@
  mix-blend-mode: difference;
  transform: translate(-50%, -50%);
  transition: width 0.2s, height 0.2s, background-color 0.2s;
- }
-
- #cursor:not(.cursor-expanded)::before {
- content: '';
- position: absolute;
- top: 4px;
- left: 4px;
- width: 9px;
- height: 9px;
- border: 2px solid #121212;
- border-radius: 50%;
- box-sizing: border-box;
- }
-
- #cursor:not(.cursor-expanded)::after {
- content: '';
- position: absolute;
- right: 3px;
- bottom: 3px;
- width: 7px;
- height: 2px;
- background: #121212;
- border-radius: 1px;
- transform: rotate(45deg);
- transform-origin: center;
  }
 
  #cursor.cursor-expanded {
@@ -160,6 +164,7 @@
 
  #cursor.cursor-expanded .cursor-lens {
  display: block;
+ background: transparent;
  }
 
  #cursor .cursor-tint {
@@ -205,6 +210,11 @@
  pointer-events: none;
  }
 
+ #cursor .cursor-mirror-page > .mirror-nav-layer {
+ overflow: visible;
+ z-index: 100;
+ }
+
  #cursor .cursor-mirror-page * {
  pointer-events: none !important;
  }
@@ -225,6 +235,12 @@
  }
 
  .marquee-container:hover .marquee-content {
+ animation-play-state: paused;
+ }
+
+ .marquee-offscreen .marquee-content,
+ .marquee-offscreen .marquee-content-reverse,
+ .marquee-offscreen .animate-marquee {
  animation-play-state: paused;
  }
 
@@ -428,7 +444,8 @@
  pointer-events: none;
  }
 
- #main-nav-bar {
+ #main-nav-bar,
+ .main-nav-bar {
  --mobile-nav-height: 4.25rem;
  --mobile-nav-gap: 0.75rem;
  background: transparent;
@@ -465,7 +482,8 @@
  background: #FBFF48;
  }
 
- #desktop-nav-panel {
+ #desktop-nav-panel,
+ .desktop-nav-panel {
  align-items: center;
  gap: 0.125rem;
  background: #FFFDF5;
@@ -474,7 +492,8 @@
  padding: 0.5rem;
  }
 
- #desktop-nav-panel .nav-link {
+ #desktop-nav-panel .nav-link,
+ .desktop-nav-panel .nav-link {
  padding: 0.25rem 0.625rem;
  font-family: "JetBrains Mono", monospace;
  font-weight: 700;
@@ -484,31 +503,36 @@
  transition: background-color 0.15s ease, color 0.15s ease;
  }
 
- #desktop-nav-panel .nav-hire-btn {
+ #desktop-nav-panel .nav-hire-btn,
+ .desktop-nav-panel .nav-hire-btn {
  border: 2px solid #121212;
  margin-left: 0.25rem;
  padding: 0.25rem 0.75rem;
  }
 
  @media (min-width: 768px) and (max-width: 1023px) {
- #desktop-nav-panel .nav-link {
+ #desktop-nav-panel .nav-link,
+ .desktop-nav-panel .nav-link {
  font-size: 0.75rem;
  padding: 0.2rem 0.5rem;
  }
 
- #desktop-nav-panel .nav-hire-btn {
+ #desktop-nav-panel .nav-hire-btn,
+ .desktop-nav-panel .nav-hire-btn {
  padding: 0.2rem 0.6rem;
  }
  }
 
  @media (min-width: 1024px) {
- #desktop-nav-panel .nav-link {
+ #desktop-nav-panel .nav-link,
+ .desktop-nav-panel .nav-link {
  padding: 0.25rem 0.75rem;
  }
  }
 
  @media (min-width: 768px) {
- #desktop-nav-panel {
+ #desktop-nav-panel,
+ .desktop-nav-panel {
  display: flex !important;
  }
 
@@ -533,7 +557,8 @@
  display: none;
  }
 
- #main-nav-bar {
+ #main-nav-bar,
+ .main-nav-bar {
  background: transparent;
  border-bottom: none;
  box-shadow: none;
@@ -1976,7 +2001,7 @@
  </div>
  </div>
 
- <div id="main-nav-bar" class="w-full pointer-events-auto">
+ <div id="main-nav-bar" class="main-nav-bar w-full pointer-events-auto">
  <div class="max-w-7xl mx-auto flex justify-between items-center gap-4">
  <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;"
  class="nav-logo px-3 sm:px-4 py-1 text-lg sm:text-2xl font-black cursor-hover shrink-0 min-w-0 truncate"
@@ -2093,7 +2118,7 @@
  <picture>
  <source srcset="Assets/images/yuvraj_sketch.webp" type="image/webp">
  <img src="Assets/images/yuvraj_sketch.png" alt="Yuvraj Prasad - illustrated sketch portrait"
- width="600" height="600" loading="eager" decoding="async">
+ width="600" height="600" loading="lazy" decoding="async">
  </picture>
  <span class="absolute top-2 left-2 bg-neo-black text-neo-green px-2 font-mono text-xs border border-black z-10">YUVRAJ.SKETCH</span>
  </div>

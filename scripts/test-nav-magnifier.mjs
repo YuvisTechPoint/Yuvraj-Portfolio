@@ -22,7 +22,9 @@ const report = await page.evaluate(({ px, py }) => {
     const mainNav = document.querySelector('nav[aria-label="Main navigation"]');
     const rail = document.getElementById('section-rail');
     const mirrorPage = document.getElementById('cursor')?.querySelector('.cursor-mirror-page');
-    const navClones = mirrorPage ? Array.from(mirrorPage.children).filter((n) => n.tagName === 'NAV') : [];
+    const navClones = mirrorPage
+        ? Array.from(mirrorPage.children).filter((n) => n.classList.contains('mirror-nav-layer') || n.querySelector('.nav-logo'))
+        : [];
     const mainNavRect = mainNav?.getBoundingClientRect();
 
     return {
@@ -48,7 +50,7 @@ const report = await page.evaluate(({ px, py }) => {
         }),
         mirrorStack: (() => {
             const layers = mirrorPage ? Array.from(mirrorPage.children) : [];
-            const mainNavClone = layers.find((node) => node.querySelector('.nav-logo'));
+            const mainNavClone = layers.find((node) => node.classList.contains('mirror-nav-layer'));
             const mainClone = layers.find((node) => node.tagName === 'MAIN');
             return {
                 navZ: mainNavClone ? parseInt(mainNavClone.style.zIndex, 10) : null,
