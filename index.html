@@ -716,32 +716,29 @@
  align-items: center;
  justify-content: center;
  }
- }
-
- #contact #contact-panel {
- overflow: visible;
- }
 
  #contact .contact-badge {
- position: relative;
+ position: static;
+ top: auto;
+ left: auto;
+ right: auto;
+ transform: rotate(-2deg);
  display: inline-block;
  margin-bottom: 1.25rem;
  max-width: 100%;
- z-index: 3;
- transform: rotate(-3deg);
- transform-origin: left bottom;
  }
 
  #contact .contact-badge span {
  font-size: 0.875rem;
  line-height: 1.2;
  }
+ }
 
  @media (min-width: 768px) {
  #contact .contact-badge {
  position: absolute;
- top: -2.85rem;
- left: -2rem;
+ top: -2.5rem;
+ left: 0.25rem;
  margin-bottom: 0;
  }
 
@@ -2993,7 +2990,7 @@
  <section id="contact" data-section-theme="contact" class="py-24 px-4 max-w-5xl mx-auto">
  <div id="contact-panel" class="bg-white border-4 border-black shadow-hard-xl p-5 sm:p-8 md:p-12 relative reveal mt-4 sm:mt-12" tabindex="-1">
  <div
- class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard">
+ class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard rotate-[-5deg]">
  <span class="font-black text-sm sm:text-2xl">START A PROJECT</span>
  </div>
 
