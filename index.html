@@ -904,48 +904,50 @@
 
  #contact .contact-panel-wrap {
  position: relative;
- }
-
- #contact #contact-panel {
- position: relative;
- overflow: visible;
+ display: flex;
+ flex-direction: column;
+ align-items: flex-start;
+ gap: 0;
  }
 
  #contact .contact-badge {
- position: absolute;
- top: -1rem;
- right: 0.75rem;
- z-index: 3;
+ position: relative;
+ z-index: 2;
  display: inline-block;
- transform: rotate(4deg);
- transform-origin: right center;
- max-width: calc(100% - 1.5rem);
- margin: 0;
+ width: fit-content;
+ max-width: 100%;
+ transform: rotate(-3deg);
+ transform-origin: left bottom;
+ margin: 0 0 0.75rem;
+ flex-shrink: 0;
  }
 
  #contact .contact-badge span {
  display: block;
- font-size: 0.75rem;
+ font-size: 0.875rem;
  line-height: 1.2;
  white-space: nowrap;
  }
 
+ #contact #contact-panel {
+ width: 100%;
+ margin-top: 0;
+ }
+
  @media (min-width: 640px) {
  #contact .contact-badge {
- top: -1.25rem;
- right: 1.25rem;
+ margin-bottom: 1rem;
  }
 
  #contact .contact-badge span {
- font-size: 1.125rem;
+ font-size: 1.25rem;
  }
  }
 
  @media (min-width: 768px) {
  #contact .contact-badge {
- top: -1.5rem;
- right: 2rem;
- transform: rotate(5deg);
+ margin-left: -0.75rem;
+ margin-bottom: 1.25rem;
  }
 
  #contact .contact-badge span {
@@ -3011,12 +3013,12 @@
  </section>
 
  <section id="contact" data-section-theme="contact" class="py-24 px-4 max-w-5xl mx-auto">
- <div class="contact-panel-wrap relative mt-8 sm:mt-12">
- <div id="contact-panel" class="bg-white border-4 border-black shadow-hard-xl p-5 sm:p-8 md:p-12 relative reveal" tabindex="-1">
- <div class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard w-fit">
+ <div class="contact-panel-wrap relative mt-6 sm:mt-10">
+ <div class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard">
  <span class="font-black">START A PROJECT</span>
  </div>
 
+ <div id="contact-panel" class="bg-white border-4 border-black shadow-hard-xl p-5 sm:p-8 md:p-12 relative reveal" tabindex="-1">
  <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
  <div>
  <h2 class="text-4xl sm:text-5xl md:text-6xl font-black uppercase mb-6 leading-[0.85] pt-0">Let's<br>Talk<br>Code.</h2>
