@@ -1,0 +1,25 @@
+{
+  "name": "Yuvraj Prasad — AI Product Engineer & Full Stack Developer",
+  "short_name": "Yuvraj Prasad",
+  "description": "Official portfolio of Yuvraj Prasad — AI Product Engineer, Full Stack Developer, hackathon winner from Kolkata.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFDF5",
+  "theme_color": "#121212",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "/Assets/images/title_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Assets/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

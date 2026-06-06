@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Preview</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #525252; }
+    #toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      background: #121212;
+      border-bottom: 2px solid #000;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+    #toolbar button {
+      font: inherit;
+      font-weight: 700;
+      padding: 0.25rem 0.625rem;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+    }
+    #toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    #page-info { min-width: 5rem; text-align: center; }
+    #viewport {
+      height: calc(100% - 2.5rem);
+      overflow: auto;
+      padding: 1rem;
+      text-align: center;
+    }
+    #canvas {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      background: #fff;
+    }
+    #status {
+      color: #fff;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.875rem;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <button type="button" id="prev-btn" aria-label="Previous page">PREV</button>
+    <span id="page-info">-- / --</span>
+    <button type="button" id="next-btn" aria-label="Next page">NEXT</button>
+  </div>
+  <div id="viewport">
+    <p id="status">LOADING CV...</p>
+    <canvas id="canvas" hidden></canvas>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const params = new URLSearchParams(window.location.search);
+      const defaultPdf = new URL('Resume/Yuvraj%20Prasad%20CV.pdf', window.location.href).href;
+      const pdfUrl = params.get('src') || defaultPdf;
+      const canvas = document.getElementById('canvas');
+      const statusEl = document.getElementById('status');
+      const pageInfo = document.getElementById('page-info');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const ctx = canvas.getContext('2d');
+      let pdfDoc = null;
+      let pageNum = 1;
+
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      function renderPage(num) {
+        pdfDoc.getPage(num).then(function (page) {
+          const viewport = page.getViewport({ scale: 1.35 });
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          return page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        }).then(function () {
+          pageInfo.textContent = num + ' / ' + pdfDoc.numPages;
+          prevBtn.disabled = num <= 1;
+          nextBtn.disabled = num >= pdfDoc.numPages;
+          statusEl.hidden = true;
+          canvas.hidden = false;
+        });
+      }
+
+      prevBtn.addEventListener('click', function () {
+        if (pageNum <= 1) return;
+        pageNum -= 1;
+        renderPage(pageNum);
+      });
+
+      nextBtn.addEventListener('click', function () {
+        if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
+        pageNum += 1;
+        renderPage(pageNum);
+      });
+
+      pdfjsLib.getDocument(pdfUrl).promise.then(function (pdf) {
+        pdfDoc = pdf;
+        renderPage(pageNum);
+      }).catch(function () {
+        statusEl.textContent = 'Unable to load CV preview.';
+      });
+    })();
+  </script>
+</body>
+</html>
