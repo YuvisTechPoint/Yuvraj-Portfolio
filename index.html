@@ -902,13 +902,8 @@
  box-shadow: 2px 2px 0 rgba(251, 255, 72, 0.35);
  }
 
- #contact {
- overflow: visible;
- }
-
  #contact .contact-panel-wrap {
  position: relative;
- overflow: visible;
  }
 
  #contact #contact-panel {
@@ -918,13 +913,13 @@
 
  #contact .contact-badge {
  position: absolute;
- top: -1.125rem;
- right: -0.5rem;
+ top: -1rem;
+ right: 0.75rem;
  z-index: 3;
  display: inline-block;
  transform: rotate(4deg);
- transform-origin: center center;
- max-width: min(16rem, calc(100% - 1rem));
+ transform-origin: right center;
+ max-width: calc(100% - 1.5rem);
  margin: 0;
  }
 
@@ -937,8 +932,8 @@
 
  @media (min-width: 640px) {
  #contact .contact-badge {
- top: -1.375rem;
- right: -0.75rem;
+ top: -1.25rem;
+ right: 1.25rem;
  }
 
  #contact .contact-badge span {
@@ -949,7 +944,7 @@
  @media (min-width: 768px) {
  #contact .contact-badge {
  top: -1.5rem;
- right: -1rem;
+ right: 2rem;
  transform: rotate(5deg);
  }
 
