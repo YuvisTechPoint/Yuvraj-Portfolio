@@ -261,6 +261,14 @@
             return false;
         }
 
+        function getMirrorZIndex(el) {
+            const style = getComputedStyle(el);
+            const parsed = parseInt(style.zIndex, 10);
+            if (!Number.isNaN(parsed)) return parsed;
+            if (style.position === 'fixed' || style.position === 'sticky') return 20;
+            return 0;
+        }
+
         function syncMirrorLayerPositions() {
             mirrorSources.forEach(({ original, clone }) => {
                 if (!original.isConnected) return;
@@ -270,6 +278,7 @@
                     return;
                 }
                 clone.style.visibility = 'visible';
+                clone.style.zIndex = String(getMirrorZIndex(original));
                 clone.style.top = `${rect.top}px`;
                 clone.style.left = `${rect.left}px`;
                 clone.style.width = `${rect.width}px`;
@@ -311,6 +320,7 @@
                 clone.removeAttribute('id');
                 clone.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
                 clone.setAttribute('aria-hidden', 'true');
+                clone.style.zIndex = String(getMirrorZIndex(child));
                 page.appendChild(clone);
                 mirrorSources.push({ original: child, clone });
             });
