@@ -716,7 +716,38 @@
  align-items: center;
  justify-content: center;
  }
+ }
 
+ #contact #contact-panel {
+ overflow: visible;
+ }
+
+ #contact .contact-badge {
+ position: relative;
+ display: inline-block;
+ margin-bottom: 1.25rem;
+ max-width: 100%;
+ z-index: 3;
+ transform: rotate(-3deg);
+ transform-origin: left bottom;
+ }
+
+ #contact .contact-badge span {
+ font-size: 0.875rem;
+ line-height: 1.2;
+ }
+
+ @media (min-width: 768px) {
+ #contact .contact-badge {
+ position: absolute;
+ top: -2.85rem;
+ left: -2rem;
+ margin-bottom: 0;
+ }
+
+ #contact .contact-badge span {
+ font-size: 1.5rem;
+ }
  }
 
  .nav-hire-btn:hover {
@@ -900,59 +931,6 @@
  border-color: #FBFF48;
  color: #FBFF48;
  box-shadow: 2px 2px 0 rgba(251, 255, 72, 0.35);
- }
-
- #contact .contact-panel-wrap {
- position: relative;
- display: flex;
- flex-direction: column;
- align-items: flex-start;
- gap: 0;
- }
-
- #contact .contact-badge {
- position: relative;
- z-index: 2;
- display: inline-block;
- width: fit-content;
- max-width: 100%;
- transform: rotate(-3deg);
- transform-origin: left bottom;
- margin: 0 0 0.75rem;
- flex-shrink: 0;
- }
-
- #contact .contact-badge span {
- display: block;
- font-size: 0.875rem;
- line-height: 1.2;
- white-space: nowrap;
- }
-
- #contact #contact-panel {
- width: 100%;
- margin-top: 0;
- }
-
- @media (min-width: 640px) {
- #contact .contact-badge {
- margin-bottom: 1rem;
- }
-
- #contact .contact-badge span {
- font-size: 1.25rem;
- }
- }
-
- @media (min-width: 768px) {
- #contact .contact-badge {
- margin-left: -0.75rem;
- margin-bottom: 1.25rem;
- }
-
- #contact .contact-badge span {
- font-size: 1.5rem;
- }
  }
 
  .contact-socials {
@@ -3013,12 +2991,12 @@
  </section>
 
  <section id="contact" data-section-theme="contact" class="py-24 px-4 max-w-5xl mx-auto">
- <div class="contact-panel-wrap relative mt-6 sm:mt-10">
- <div class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard">
- <span class="font-black">START A PROJECT</span>
+ <div id="contact-panel" class="bg-white border-4 border-black shadow-hard-xl p-5 sm:p-8 md:p-12 relative reveal mt-4 sm:mt-12" tabindex="-1">
+ <div
+ class="contact-badge bg-neo-yellow border-4 border-black px-3 sm:px-6 py-2 shadow-hard">
+ <span class="font-black text-sm sm:text-2xl">START A PROJECT</span>
  </div>
 
- <div id="contact-panel" class="bg-white border-4 border-black shadow-hard-xl p-5 sm:p-8 md:p-12 relative reveal" tabindex="-1">
  <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
  <div>
  <h2 class="text-4xl sm:text-5xl md:text-6xl font-black uppercase mb-6 leading-[0.85] pt-0">Let's<br>Talk<br>Code.</h2>
@@ -3089,6 +3067,7 @@
  class="w-12 h-12 bg-neo-black text-white flex items-center justify-center border-2 border-black hover:bg-neo-red hover:text-white transition-colors cursor-hover"><i class="ri-youtube-fill text-xl"></i></a>
  </div>
  </div>
+ </div>
 
  <form id="contact-form" class="space-y-6 bg-gray-50 p-6 border-2 border-black" novalidate>
  <div class="flex flex-col">
@@ -3124,7 +3103,6 @@
  </a>
  </div>
  </form>
- </div>
  </div>
  </div>
  </section>
