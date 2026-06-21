@@ -2,12 +2,20 @@
   "name": "yuvraj-portfolio",
   "private": true,
   "scripts": {
+    "build": "npm run build:css",
     "build:css": "tailwindcss -i ./Assets/css/input.css -o ./Assets/css/main.css --minify",
     "watch:css": "tailwindcss -i ./Assets/css/input.css -o ./Assets/css/main.css --watch",
-    "optimize:images": "node scripts/optimize-images.mjs"
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "generate:og": "node scripts/generate-og-banner.mjs",
+    "generate:previews": "node scripts/generate-project-previews.mjs",
+    "verify:assets": "node scripts/verify-assets.mjs",
+    "test:magnifier": "node scripts/test-magnifier.mjs",
+    "test:nav-magnifier": "node scripts/test-nav-magnifier.mjs",
+    "predeploy": "npm run build:css && npm run verify:assets"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
+    "playwright": "^1.52.0",
     "postcss": "^8.4.49",
     "sharp": "^0.33.5",
     "tailwindcss": "^3.4.17"

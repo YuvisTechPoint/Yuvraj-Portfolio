@@ -8,6 +8,7 @@
   "background_color": "#FFFDF5",
   "theme_color": "#121212",
   "lang": "en-IN",
+  "categories": ["business", "productivity", "portfolio"],
   "icons": [
     {
       "src": "/Assets/images/title_icon.png",
@@ -20,6 +21,26 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Projects",
+      "short_name": "Work",
+      "url": "/#projects",
+      "icons": [{ "src": "/Assets/images/title_icon.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "Contact",
+      "short_name": "Hire",
+      "url": "/#contact",
+      "icons": [{ "src": "/Assets/images/title_icon.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "Download CV",
+      "short_name": "CV",
+      "url": "/Assets/Resume/Yuvraj%20Prasad%20CV.pdf",
+      "icons": [{ "src": "/Assets/images/title_icon.png", "sizes": "512x512" }]
     }
   ]
 }

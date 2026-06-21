@@ -181,8 +181,14 @@
     }
 
     function bootstrapAfterConsent() {
+        if (cacheConsent === 'decline') return;
         prefetchHeroGitHubCount();
         startStatsApisWhenVisible();
+    }
+
+    function setBackgroundInert(inert) {
+        const main = document.getElementById('main-content');
+        if (main) main.setAttribute('aria-hidden', inert ? 'true' : 'false');
     }
 
     function trapFocusIn(container) {
@@ -292,7 +298,7 @@
         document.addEventListener('keydown', (e) => {
             const banner = document.getElementById('cookie-consent');
             if (e.key === 'Escape' && banner?.classList.contains('is-visible')) {
-                hideCookieConsent();
+                applyConsent('essential');
             }
         });
 
@@ -308,6 +314,7 @@
 
     window.ypOpenCookieSettings = showCookieConsent;
     window.ypGetConsent = () => cacheConsent;
+    window.ypTrapFocus = trapFocusIn;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -318,12 +325,16 @@
     const CURSOR_HOVER = 80;
     const CURSOR_ZOOM = 2.1;
     const CURSOR_INTERACTIVE = '.cursor-hover, a, button, input, textarea, select, label, h1, h2, h3, h4, h5, h6';
-    const CURSOR_MAGNIFY_BLOCK = '#profile-flip-card, #cv-modal, #command-palette, #mobile-menu, #mobile-menu-backdrop';
+    const CURSOR_MAGNIFY_BLOCK = '#profile-flip-card, #cv-modal, #project-modal, #shortcuts-modal, #command-palette, #mobile-menu, #mobile-menu-backdrop, #page-loader, #cookie-consent';
 
     if (cursor && !prefersReducedMotion && !isTouchDevice && !navigator.connection?.saveData && window.innerWidth >= 1024) {
         const mirrorHost = cursor.querySelector('.cursor-mirror');
         let cursorExpanded = false;
         let mirrorSources = [];
+
+        function cursorEnabled() {
+            return !document.body.classList.contains('boot-loading') && !document.hidden;
+        }
 
         function resetCursorMirror() {
             mirrorSources = [];
@@ -390,14 +401,10 @@
             });
         }
 
-        function getMirrorLayerRect(original) {
-            return original.getBoundingClientRect();
-        }
-
         function syncMirrorLayerPositions() {
             mirrorSources.forEach(({ original, clone }) => {
                 if (!original.isConnected) return;
-                const rect = getMirrorLayerRect(original);
+                const rect = original.getBoundingClientRect();
                 if (rect.width < 1 || rect.height < 1) {
                     clone.style.visibility = 'hidden';
                     return;
@@ -500,24 +507,43 @@
             resetCursorMirror();
         }
 
-        let lastCursorX = 0;
-        let lastCursorY = 0;
+        let lastCursorX = -100;
+        let lastCursorY = -100;
         let cursorFramePending = false;
+
+        function paintCursor() {
+            cursorFramePending = false;
+
+            if (!cursorEnabled()) {
+                cursor.style.visibility = 'hidden';
+                if (cursorExpanded) setCursorExpanded(false, lastCursorX, lastCursorY);
+                return;
+            }
+
+            cursor.style.visibility = 'visible';
+            cursor.style.left = `${lastCursorX}px`;
+            cursor.style.top = `${lastCursorY}px`;
+            const interactive = shouldMagnifyAt(lastCursorX, lastCursorY);
+            setCursorExpanded(interactive, lastCursorX, lastCursorY);
+            if (cursorExpanded) updateViewportMirror(lastCursorX, lastCursorY, CURSOR_HOVER);
+        }
+
+        function scheduleCursorPaint() {
+            if (cursorFramePending) return;
+            cursorFramePending = true;
+            requestAnimationFrame(paintCursor);
+        }
 
         document.addEventListener('mousemove', (e) => {
             lastCursorX = e.clientX;
             lastCursorY = e.clientY;
-            if (cursorFramePending) return;
-            cursorFramePending = true;
-            requestAnimationFrame(() => {
-                cursorFramePending = false;
-                cursor.style.left = `${lastCursorX}px`;
-                cursor.style.top = `${lastCursorY}px`;
-                const interactive = shouldMagnifyAt(lastCursorX, lastCursorY);
-                setCursorExpanded(interactive, lastCursorX, lastCursorY);
-                if (cursorExpanded) updateViewportMirror(lastCursorX, lastCursorY, CURSOR_HOVER);
-            });
+            scheduleCursorPaint();
         }, { passive: true });
+
+        document.addEventListener('visibilitychange', () => scheduleCursorPaint());
+
+        const bootObserver = new MutationObserver(() => scheduleCursorPaint());
+        bootObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
         let mirrorScrollTicking = false;
         window.addEventListener('scroll', () => {
@@ -541,6 +567,13 @@
                 }
             }, 150);
         }, { passive: true });
+
+        scheduleCursorPaint();
+        window.ypRefreshCursorMirror = function refreshCursorMirror() {
+            if (!cursorExpanded) return;
+            buildViewportMirror();
+            syncViewportMirror(lastCursorX, lastCursorY, CURSOR_HOVER);
+        };
     } else if (cursor) {
         cursor.remove();
         document.body.style.cursor = 'auto';
@@ -639,7 +672,7 @@
     }
 
     /* --- Navigation: smooth scroll + active section sync --- */
-    const NAV_SECTIONS = ['about', 'skills', 'experience', 'projects', 'reports', 'contact'];
+    const NAV_SECTIONS = ['about', 'skills', 'experience', 'education', 'coding-stats', 'projects', 'achievements', 'intellectual-property', 'reports', 'contact'];
     const navLinks = document.querySelectorAll('.nav-link[data-nav]');
 
     function getNavOffset() {
@@ -739,7 +772,9 @@
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         if (progressBar) {
-            progressBar.style.width = (height > 0 ? (scrollTop / height) * 100 : 0) + '%';
+            const pct = height > 0 ? Math.round((scrollTop / height) * 100) : 0;
+            progressBar.style.width = pct + '%';
+            progressBar.setAttribute('aria-valuenow', String(pct));
         }
         const backToTop = document.getElementById('back-to-top');
         if (backToTop) backToTop.classList.toggle('visible', scrollTop > 600);
@@ -819,6 +854,7 @@
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event: eventName, ...params });
     }
+    window.pushGtmEvent = pushGtmEvent;
 
     document.querySelectorAll('[data-track]').forEach((el) => {
         el.addEventListener('click', () => {
@@ -837,6 +873,81 @@
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove('visible'), 4000);
     }
+    window.showToast = showToast;
+
+    const PORTFOLIO_SITE_URL = 'https://yuvrajprasad.vercel.app/';
+
+    function getPortfolioShareUrl() {
+        const { protocol, hostname } = window.location;
+        if (protocol === 'file:' || hostname === 'localhost' || hostname === '127.0.0.1') {
+            return PORTFOLIO_SITE_URL;
+        }
+        return window.location.href.split('#')[0];
+    }
+
+    function fallbackCopyText(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        let ok = false;
+        try {
+            ok = document.execCommand('copy');
+        } catch {
+            // execCommand unavailable
+        }
+        document.body.removeChild(textArea);
+        return ok;
+    }
+
+    async function sharePortfolio() {
+        const url = getPortfolioShareUrl();
+        const shareData = {
+            title: 'YUVRAJ PRASAD | AI Product Engineer & Full Stack Developer',
+            text: 'Portfolio of Yuvraj Prasad — AI Product Engineer & Full Stack Developer',
+            url,
+        };
+
+        if (navigator.share && window.isSecureContext) {
+            try {
+                await navigator.share(shareData);
+                pushGtmEvent('share_portfolio', { method: 'web_share' });
+                return;
+            } catch (err) {
+                if (err?.name === 'AbortError') return;
+            }
+        }
+
+        let copied = false;
+        if (navigator.clipboard?.writeText) {
+            try {
+                await navigator.clipboard.writeText(url);
+                copied = true;
+            } catch {
+                // fall through to execCommand
+            }
+        }
+        if (!copied) copied = fallbackCopyText(url);
+
+        if (copied) {
+            showToast('[ ✓ COPIED ] Portfolio link copied', 'success');
+            pushGtmEvent('share_portfolio', { method: 'clipboard' });
+        } else {
+            showToast('[ ✗ FAILED ] Could not copy link', 'error');
+        }
+    }
+
+    window.ypSharePortfolio = sharePortfolio;
+    document.getElementById('hero-share-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        sharePortfolio();
+    });
+    document.getElementById('sticky-share-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        sharePortfolio();
+    });
 
     /* --- Portfolio highlights (deferred until #reports is near viewport) --- */
     const SHOW_TESTIMONIALS = false;
@@ -979,6 +1090,8 @@
         window.location.href = `mailto:${CONTACT_RECIPIENT}?subject=${mailSubject}&body=${mailBody}`;
     }
 
+    const CONTACT_LIMITS = { name: 100, email: 254, subject: 120, message: 5000 };
+
     async function submitContactForm(event) {
         event.preventDefault();
         const form = document.getElementById('contact-form');
@@ -991,11 +1104,19 @@
         if (!form || !nameInput || !emailInput || !messageInput) return false;
 
         const payload = {
-            name: nameInput.value.trim(),
-            email: emailInput.value.trim(),
-            subject: subjectInput?.value.trim() || 'Portfolio contact',
-            message: messageInput.value.trim(),
+            name: nameInput.value.trim().slice(0, CONTACT_LIMITS.name),
+            email: emailInput.value.trim().slice(0, CONTACT_LIMITS.email),
+            subject: (subjectInput?.value.trim() || 'Portfolio contact').slice(0, CONTACT_LIMITS.subject),
+            message: messageInput.value.trim().slice(0, CONTACT_LIMITS.message),
+            company: document.getElementById('contact-company')?.value.trim() || '',
         };
+
+        if (payload.company) {
+            showFormStatus('success', 'Message sent. I usually reply within 48 hours.');
+            showToast('[ ✓ SENT ] Message delivered successfully.', 'success');
+            form.reset();
+            return false;
+        }
 
         if (!payload.name || !payload.email || !payload.message) {
             showFormStatus('error', 'Fill in name, email, and message.');
@@ -1032,6 +1153,12 @@
             }
 
             const err = await response.json().catch(() => ({}));
+            if (response.status === 429) {
+                showFormStatus('error', err.error || 'Too many attempts. Please wait a minute.');
+                showToast('[ ✗ RATE LIMIT ] Try again shortly.', 'error');
+                return false;
+            }
+
             if (response.status === 501) {
                 openMailtoContact(payload);
                 showFormStatus('info', 'Email service not configured here — your mail app should open. Send the message to complete contact.');
@@ -1158,6 +1285,8 @@
                     `<div class="min-w-[70px] flex flex-col items-center group/badge"><div class="w-10 h-10 mb-2 relative group-hover/badge:-translate-y-1 transition-transform flex items-center justify-center border-2 border-white/20 rounded-full bg-white/5 shadow-[2px_2px_0_rgba(51,255,87,0.3)] hover:border-neo-green hover:shadow-[4px_4px_0_rgba(51,255,87,1)] cursor-pointer"><i class="${badge.icon} text-neo-green text-xl drop-shadow-[2px_2px_0_rgba(0,0,0,1)]"></i></div><span class="text-[9px] font-mono text-gray-300 font-bold text-center w-full truncate px-1" title="${badge.name}">${badge.name}</span></div>`
                 ).join('');
             }
+
+            renderGitHubActivity(repos);
         } catch (error) {
             console.error('GitHub fetch error:', error);
             setText('repos-count', '--');
@@ -1173,6 +1302,35 @@
                 statusEl.className = 'text-neo-red text-[9px] font-mono uppercase tracking-widest';
             }
         }
+    }
+
+    function renderGitHubActivity(repos) {
+        const el = document.getElementById('gh-recent-activity');
+        if (!el || !Array.isArray(repos) || !repos.length) {
+            if (el) el.innerHTML = '<p class="font-mono text-xs text-gray-500">No public repositories found.</p>';
+            return;
+        }
+
+        const recent = [...repos]
+            .filter((repo) => repo && !repo.fork && repo.name)
+            .sort((a, b) => new Date(b.pushed_at || 0) - new Date(a.pushed_at || 0))
+            .slice(0, 4);
+
+        if (!recent.length) {
+            el.innerHTML = '<p class="font-mono text-xs text-gray-500">No recent activity.</p>';
+            return;
+        }
+
+        el.innerHTML = `<ul class="space-y-2">${recent.map((repo) => {
+            const pushed = repo.pushed_at
+                ? new Date(repo.pushed_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })
+                : '';
+            const lang = repo.language ? `<span class="text-neo-green/80">${repo.language}</span>` : '';
+            return `<li class="flex items-start justify-between gap-3 font-mono text-xs border-b border-white/10 pb-2 last:border-0 last:pb-0">
+                <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="text-white hover:text-neo-green transition-colors truncate" title="${repo.name}">${repo.name}</a>
+                <span class="shrink-0 text-gray-500">${pushed}${lang ? ` · ${lang}` : ''}</span>
+            </li>`;
+        }).join('')}</ul>`;
     }
 
     /* --- LeetCode badges --- */
@@ -1231,6 +1389,10 @@
             }
 
             const badges = data.badges || [];
+            const rankingEl = document.getElementById('lc-ranking');
+            if (rankingEl) {
+                rankingEl.textContent = badges.length ? String(badges.length) : '—';
+            }
             if (historyContainer) {
                 if (badges.length) {
                     const repeated = [...badges, ...badges, ...badges];
@@ -1246,6 +1408,8 @@
             console.error('LeetCode fetch error:', error);
             const msg = typeof error?.message === 'string' ? error.message : '';
             const isNotFound = msg.toLowerCase().includes('not found');
+            const rankingEl = document.getElementById('lc-ranking');
+            if (rankingEl) rankingEl.textContent = '—';
             renderUnavailable(isNotFound ? 'User not found' : 'Unavailable');
         }
     }
@@ -1279,7 +1443,7 @@
                 const year = card.dataset.year || '';
                 const tier = card.dataset.tier || '';
                 let show = filter === 'all';
-                if (filter === '2025' || filter === '2026') show = year === filter;
+                if (filter === '2025') show = year === filter;
                 else if (filter === 'winner') show = tier === 'winner';
                 else if (filter === 'runner-up') show = tier === 'runner-up';
                 card.classList.toggle('achievement-hidden', !show);
@@ -1306,8 +1470,9 @@
     const heroTypewriter = document.getElementById('hero-typewriter');
     if (heroTypewriter && !prefersReducedMotion) {
         const roles = [
-            'AI Product Engineer',
-            'Co-Founder @ Apex Circle',
+            'AI Product Engineer @ Mewayz',
+            'Full Stack Developer @ Orcrys',
+            'Co-Founder @ KomProTech',
             'Patent Holder',
             'Hackathon Winner',
             'MERN | Java | Python | AI/ML | Web3'
@@ -1390,6 +1555,7 @@
         cvModal.hidden = false;
         cvModal.classList.add('open');
         document.body.style.overflow = 'hidden';
+        setBackgroundInert(true);
         setCvModalLoading(true);
         clearTimeout(cvLoadTimer);
         cvModalFrame.onload = () => {
@@ -1410,6 +1576,7 @@
         cvModal.classList.remove('open');
         cvModal.hidden = true;
         document.body.style.overflow = '';
+        setBackgroundInert(false);
         releaseCvFocusTrap?.();
         releaseCvFocusTrap = null;
         if (cvModalFrame) {
@@ -1430,6 +1597,87 @@
         if (e.key === 'Escape' && cvModal?.classList.contains('open')) closeCvModal();
     });
 
+    /* --- Project detail modal --- */
+    const projectModal = document.getElementById('project-modal');
+    const projectModalBody = document.getElementById('project-modal-body');
+    const projectModalTitle = document.getElementById('project-modal-title');
+    const projectModalClose = document.getElementById('project-modal-close');
+    let releaseProjectFocusTrap = null;
+    let projectModalLastFocus = null;
+
+    function findProjectBySlug(slug) {
+        return (window.PORTFOLIO_PROJECTS || []).find((p) => p.slug === slug);
+    }
+
+    function isGithubUrl(url) {
+        return /^https:\/\/(www\.)?github\.com\//i.test(url || '');
+    }
+
+    function openProjectModal(slug) {
+        const project = findProjectBySlug(slug);
+        if (!project || !projectModal || !projectModalBody) return;
+
+        window.ensureProjectsGrid?.();
+
+        projectModalLastFocus = document.activeElement;
+        projectModalTitle.textContent = `${project.title.toUpperCase()}_DETAILS.txt`;
+
+        const links = [];
+        if (project.live) {
+            links.push(`<a href="${project.live}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-neo-green text-black border-2 border-black font-mono text-xs font-bold hover:bg-black hover:text-white transition-colors" data-track="project_live">LIVE SITE</a>`);
+        }
+        if (project.github && isGithubUrl(project.github)) {
+            links.push(`<a href="${project.github}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-neo-black text-white border-2 border-black font-mono text-xs font-bold hover:bg-neo-blue transition-colors" data-track="project_github">GITHUB</a>`);
+        } else if (project.github && project.github !== project.live) {
+            links.push(`<a href="${project.github}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 bg-neo-black text-white border-2 border-black font-mono text-xs font-bold hover:bg-neo-blue transition-colors" data-track="project_link">VIEW SITE</a>`);
+        }
+
+        projectModalBody.innerHTML = `
+            <p class="font-mono text-xs uppercase text-gray-500 mb-2">${project.role}</p>
+            <p class="font-mono text-sm mb-4 leading-relaxed">${project.desc}</p>
+            <h4 class="font-black uppercase text-sm mb-2">Highlights</h4>
+            <ul class="project-modal-highlights space-y-2 font-mono text-sm mb-5">${project.highlights.map((item) => `<li>${item}</li>`).join('')}</ul>
+            <div class="flex flex-wrap gap-2 mb-5">${(project.tags || []).map((tag) => `<span class="bg-neo-black text-white px-2 py-1 font-mono text-xs font-bold">${tag}</span>`).join('')}</div>
+            <div class="flex flex-wrap gap-2">${links.join('')}
+            <button type="button" id="project-modal-copy" class="px-3 py-1 bg-neo-yellow text-black border-2 border-black font-mono text-xs font-bold hover:bg-black hover:text-white transition-colors">COPY LINK</button></div>`;
+
+        projectModalBody.querySelector('#project-modal-copy')?.addEventListener('click', () => {
+            window.ypCopyProjectLink?.(project.slug);
+        });
+
+        projectModalBody.querySelectorAll('[data-track]').forEach((el) => {
+            el.addEventListener('click', () => pushGtmEvent(el.dataset.track, { label: project.title }));
+        });
+
+        projectModal.hidden = false;
+        projectModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setBackgroundInert(true);
+        pushGtmEvent('project_view', { label: project.title });
+        history.replaceState(null, '', `#projects?project=${encodeURIComponent(project.slug)}`);
+        releaseProjectFocusTrap?.();
+        releaseProjectFocusTrap = trapFocusIn(document.getElementById('project-modal-panel'));
+        projectModalClose?.focus({ preventScroll: true });
+    }
+
+    function closeProjectModal() {
+        if (!projectModal) return;
+        projectModal.classList.remove('open');
+        projectModal.hidden = true;
+        document.body.style.overflow = '';
+        setBackgroundInert(false);
+        releaseProjectFocusTrap?.();
+        releaseProjectFocusTrap = null;
+        projectModalLastFocus?.focus?.({ preventScroll: true });
+    }
+
+    window.openProjectModal = openProjectModal;
+    projectModalClose?.addEventListener('click', closeProjectModal);
+    projectModal?.addEventListener('click', (e) => { if (e.target === projectModal) closeProjectModal(); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && projectModal?.classList.contains('open')) closeProjectModal();
+    });
+
     /* --- Command palette (Ctrl+K / /) --- */
     const commandPalette = document.getElementById('command-palette');
     const commandInput = document.getElementById('command-palette-input');
@@ -1438,12 +1686,21 @@
         { cmd: 'goto about', label: 'Scroll to About', action: () => scrollToSection('about') },
         { cmd: 'goto skills', label: 'Scroll to Skills', action: () => scrollToSection('skills') },
         { cmd: 'goto logs', label: 'Scroll to Experience', action: () => scrollToSection('experience') },
+        { cmd: 'goto education', label: 'Scroll to Education', action: () => scrollToSection('education') },
+        { cmd: 'goto stats', label: 'Scroll to Coding Stats', action: () => scrollToSection('coding-stats') },
         { cmd: 'goto projects', label: 'Scroll to Projects', action: () => scrollToSection('projects') },
+        { cmd: 'goto achievements', label: 'Scroll to Achievements', action: () => scrollToSection('achievements') },
+        { cmd: 'goto patent', label: 'Scroll to Patent & IP', action: () => scrollToSection('intellectual-property') },
         { cmd: 'goto contact', label: 'Scroll to Contact', action: () => scrollToSection('contact') },
         { cmd: 'goto wins', label: 'Scroll to Portfolio Wins', action: () => scrollToSection('reports') },
         { cmd: 'download cv', label: 'Download CV', action: () => { window.location.href = 'Assets/Resume/Yuvraj%20Prasad%20CV.pdf'; pushGtmEvent('cv_download'); } },
         { cmd: 'preview cv', label: 'Preview CV', action: openCvModal },
+        { cmd: 'book call', label: 'Book a call on LinkedIn', action: () => { window.open('https://www.linkedin.com/in/yuvrajprasad/', '_blank', 'noopener'); pushGtmEvent('book_call'); } },
+        { cmd: 'share', label: 'Share portfolio', action: () => window.ypSharePortfolio?.() },
+        { cmd: 'copy link', label: 'Copy link to current section', action: () => window.ypCopySectionLink?.() },
+        { cmd: 'shortcuts', label: 'Keyboard shortcuts', action: () => window.ypOpenShortcuts?.() },
         { cmd: 'copy email', label: 'Copy email to clipboard', action: () => { navigator.clipboard?.writeText('prasadyuvraj8805@gmail.com'); showToast('[ ✓ COPIED ] prasadyuvraj8805@gmail.com', 'success'); } },
+        { cmd: 'privacy', label: 'Open privacy policy', action: () => { window.location.href = 'privacy.html'; } },
         { cmd: 'status', label: 'Show availability status', action: () => showToast('[ ✓ STATUS ] Available for work · Kolkata, India', 'info') }
     ];
     let commandActiveIndex = 0;
@@ -1466,12 +1723,18 @@
         command?.action();
     }
 
+    let releaseCommandFocusTrap = null;
+
     function openCommandPalette() {
         if (!commandPalette) return;
         commandPalette.hidden = false;
         commandPalette.classList.add('open');
         renderCommands('');
         commandInput.value = '';
+        setBackgroundInert(true);
+        releaseCommandFocusTrap?.();
+        const box = document.getElementById('command-palette-box');
+        releaseCommandFocusTrap = box ? trapFocusIn(box) : null;
         setTimeout(() => commandInput?.focus(), 50);
     }
 
@@ -1479,6 +1742,9 @@
         if (!commandPalette) return;
         commandPalette.classList.remove('open');
         commandPalette.hidden = true;
+        setBackgroundInert(false);
+        releaseCommandFocusTrap?.();
+        releaseCommandFocusTrap = null;
     }
 
     if (commandInput) {
@@ -1516,6 +1782,22 @@
             openCommandPalette();
         }
     });
+
+    document.getElementById('open-command-palette-btn')?.addEventListener('click', openCommandPalette);
+
+    function updateKolkataClock() {
+        const el = document.getElementById('kolkata-clock');
+        if (!el) return;
+        el.textContent = `${new Intl.DateTimeFormat('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }).format(new Date())} IST`;
+    }
+
+    updateKolkataClock();
+    setInterval(updateKolkataClock, 30000);
 
     initCookieConsent();
 })();

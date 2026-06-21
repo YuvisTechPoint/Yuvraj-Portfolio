@@ -1,0 +1,87 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>404 Not Found | Yuvraj Prasad</title>
+    <link href="Assets/css/main.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="Assets/images/title_icon.png">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #121212;
+            color: #fff;
+            cursor: auto;
+            padding: 1.5rem;
+        }
+
+        .error-panel {
+            max-width: 28rem;
+            width: 100%;
+            border: 4px solid #33FF57;
+            box-shadow: 10px 10px 0 #33FF57;
+            background: #000;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .error-code {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #FBFF48;
+        }
+
+        .error-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .error-actions a {
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+            font-size: 0.875rem;
+            border: 2px solid #fff;
+            padding: 0.75rem 1rem;
+            transition: transform 0.15s ease;
+        }
+
+        .error-actions a.primary {
+            background: #33FF57;
+            color: #121212;
+            border-color: #121212;
+            box-shadow: 4px 4px 0 #121212;
+        }
+
+        .error-actions a.secondary {
+            background: transparent;
+            color: #fff;
+        }
+
+        .error-actions a:hover {
+            transform: translate(2px, 2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-panel font-mono">
+        <p class="text-neo-green text-xs uppercase tracking-widest mb-2">ERR_ROUTE_NOT_FOUND</p>
+        <div class="error-code">404</div>
+        <h1 class="font-black text-2xl uppercase mt-3 mb-2">Page missing</h1>
+        <p class="text-gray-400 text-sm">The route you requested does not exist on this portfolio.</p>
+        <div class="error-actions">
+            <a href="/" class="primary">RETURN HOME</a>
+            <a href="/#contact" class="secondary">CONTACT YUVRAJ</a>
+        </div>
+    </div>
+</body>
+
+</html>

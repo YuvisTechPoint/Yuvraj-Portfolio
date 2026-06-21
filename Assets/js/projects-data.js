@@ -1,35 +1,58 @@
 (function () {
     'use strict';
 
+    function projectSlug(title) {
+        return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
     const PROJECTS = [
         {
             title: 'Oracle Community',
+            role: 'Site Lead & Full Stack Developer',
+            highlights: [
+                'Built the official Oracle Kolkata Community hub with courses, meetups, and cloud resources.',
+                'React + Vite frontend with Three.js visuals and Oracle Cloud integrations.',
+                'Serves students and professionals across Cloud Architecture, DevOps, and AI/ML tracks.'
+            ],
             desc: 'Official site for Oracle Kolkata Community - a free learning hub for students and professionals to connect, collaborate, and build on Oracle Cloud. Courses, meetups, missions, and resources across Cloud Architecture, Database, DevOps, Analytics, Security, and AI/ML.',
             tags: ['React', 'Vite', 'Three.js', 'Oracle Cloud', 'Node.js'],
-            dataTags: 'web web3',
+            dataTags: 'web',
             stagger: false,
             hoverClass: 'group-hover:text-red-600',
             live: 'https://oraclekol.vercel.app/',
             github: 'https://github.com/YuvisTechPoint/Oracle-Community',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://oraclekol.vercel.app/',
+            previewImage: 'Assets/images/previews/oracle-community.webp',
             label: 'Oracle Kolkata Community'
         },
         {
             title: 'Edquate',
+            role: 'Product Engineer',
+            highlights: [
+                'AI-powered learning OS with visual whiteboard, adaptive roadmaps, and code lab.',
+                'Combines tutor, practice, assessments, and career intelligence in one platform.',
+                'Built for learners and campuses with LLM-driven personalization.'
+            ],
             desc: 'AI-powered learning OS - personal tutor with visual whiteboard, adaptive roadmaps, assessments, code lab, and career intelligence. Tutor, practice, and diagnostics in one platform for learners and campuses.',
             tags: ['AI Tutor', 'EdTech', 'Roadmaps', 'Code Lab', 'LLMs'],
             dataTags: 'web ai',
             stagger: true,
             hoverClass: 'group-hover:text-neo-orange',
             live: 'https://edquate.com',
-            github: 'https://edquate.com',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://edquate.com',
+            previewImage: 'Assets/images/previews/edquate.webp',
             label: 'Edquate.com Preview'
         },
         {
             title: 'EscrowX',
+            role: 'Full Stack Web3 Developer',
+            highlights: [
+                'Decentralized escrow marketplace on Sepolia with MetaMask integration.',
+                'Smart contract lifecycle: lock ETH, release to seller, or buyer refund.',
+                'Next.js dashboard with role filters and on-chain escrow management.'
+            ],
             desc: 'Full-stack decentralized escrow marketplace on Sepolia - buyers lock ETH in a smart contract, then release payment to sellers or refund themselves. Dashboard with role filters, MetaMask integration, and on-chain escrow lifecycle management.',
             tags: ['Solidity', 'Next.js', 'Hardhat', 'ethers.js', 'Web3'],
             dataTags: 'web web3',
@@ -37,8 +60,9 @@
             hoverClass: 'group-hover:text-neo-blue',
             live: 'https://escrowx-swart.vercel.app/',
             github: 'https://github.com/YuvisTechPoint/EscrowX',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://escrowx-swart.vercel.app/',
+            previewImage: 'Assets/images/previews/escrowx.webp',
             label: 'escrowx-swart.vercel.app',
             icon: 'ri-shield-check-line',
             iconColor: 'text-neo-green'
@@ -51,9 +75,9 @@
             stagger: true,
             hoverClass: 'group-hover:text-neo-purple',
             live: 'https://orcrys.com',
-            github: 'https://orcrys.com',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://orcrys.com',
+            previewImage: 'Assets/images/previews/orcrys.webp',
             label: 'Orcrys.com Preview'
         },
         {
@@ -63,11 +87,25 @@
             dataTags: 'web ai',
             stagger: false,
             hoverClass: 'group-hover:text-neo-yellow',
-            live: 'https://vibemusic-sandy.vercel.app/',
+            live: 'https://vibemusic-official.vercel.app/',
             github: 'https://github.com/YuvisTechPoint/Vive-Music',
             preview: 'screenshot',
-            previewUrl: 'https://vibemusic-sandy.vercel.app/',
-            label: 'vibemusic-sandy.vercel.app'
+            previewUrl: 'https://vibemusic-official.vercel.app/',
+            previewImage: 'Assets/images/previews/vive-music.webp',
+            label: 'vibemusic-official.vercel.app'
+        },
+        {
+            title: 'Mohasti',
+            desc: 'Spiritual art and mindful stationery storefront — postcards, greeting cards, journals, and keepsakes with curated collections, secure UPI and card checkout, and a newsletter for studio drops and new launches.',
+            tags: ['E-commerce', 'Stationery', 'Art', 'Web App'],
+            dataTags: 'web',
+            stagger: true,
+            hoverClass: 'group-hover:text-neo-pink',
+            live: 'https://mohasti.vercel.app/',
+            preview: 'screenshot',
+            previewUrl: 'https://mohasti.vercel.app/',
+            previewImage: 'Assets/images/previews/mohasti.webp',
+            label: 'mohasti.vercel.app'
         },
         {
             title: 'Moon Watch',
@@ -77,9 +115,9 @@
             stagger: true,
             hoverClass: 'group-hover:text-neo-blue',
             live: 'https://moonwatch.in/',
-            github: 'https://moonwatch.in/',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://moonwatch.in/',
+            previewImage: 'Assets/images/previews/moon-watch.webp',
             label: 'moonwatch.in'
         },
         {
@@ -90,10 +128,37 @@
             stagger: false,
             hoverClass: 'group-hover:text-neo-pink',
             live: 'https://calcuttahacks.xyz/',
-            github: 'https://calcuttahacks.xyz/',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://calcuttahacks.xyz/',
+            previewImage: 'Assets/images/previews/calcutta-hacks.webp',
             label: 'calcuttahacks.xyz'
+        },
+        {
+            title: 'BeetleX',
+            desc: 'Full-stack hackathon platform — registration, team invites, submissions, judging workflows, and live standings during finals. Built for organizers who need operational tooling beyond spreadsheets and Discord bots.',
+            tags: ['Hackathon', 'Events', 'Platform', 'Web'],
+            dataTags: 'web',
+            stagger: true,
+            hoverClass: 'group-hover:text-neo-orange',
+            live: 'https://beetlex.vercel.app/',
+            preview: 'screenshot',
+            previewUrl: 'https://beetlex.vercel.app/',
+            previewImage: 'Assets/images/previews/beetlex.webp',
+            label: 'beetlex.vercel.app'
+        },
+        {
+            title: 'Qualytics',
+            desc: 'Production-grade marketing site for an AI-augmented data quality platform — Next.js with Three.js hero visuals, D3 dashboards, Framer Motion scroll reveals, Prisma-backed demo and trial forms, and Sanity CMS content architecture.',
+            tags: ['Next.js', 'Three.js', 'D3.js', 'Prisma', 'Data Quality'],
+            dataTags: 'web ai',
+            stagger: false,
+            hoverClass: 'group-hover:text-neo-blue',
+            github: 'https://github.com/YuvisTechPoint/Qualytics',
+            preview: 'screenshot',
+            previewUrl: 'https://github.com/YuvisTechPoint/Qualytics',
+            previewImage: 'Assets/images/previews/qualytics.webp',
+            label: 'github.com/YuvisTechPoint/Qualytics',
+            previewBadge: 'Open Source',
         },
         {
             title: 'Jurisbloom Associates',
@@ -103,9 +168,9 @@
             stagger: true,
             hoverClass: 'group-hover:text-neo-purple',
             live: 'https://jurisbloomassociates.in/',
-            github: 'https://jurisbloomassociates.in/',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://jurisbloomassociates.in/',
+            previewImage: 'Assets/images/previews/jurisbloom-associates.webp',
             label: 'jurisbloomassociates.in'
         },
         {
@@ -116,9 +181,9 @@
             stagger: false,
             hoverClass: 'group-hover:text-neo-green',
             live: 'https://ceodebanjan.vercel.app/',
-            github: 'https://ceodebanjan.vercel.app/',
-            preview: 'iframe',
+            preview: 'screenshot',
             previewUrl: 'https://ceodebanjan.vercel.app/',
+            previewImage: 'Assets/images/previews/ceo-debanjan.webp',
             label: 'ceodebanjan.vercel.app'
         },
         {
@@ -129,20 +194,34 @@
             stagger: false,
             hoverClass: 'group-hover:text-neo-red',
             github: 'https://github.com/YuvisTechPoint/CivicTrust',
-            preview: 'github',
+            preview: 'screenshot',
+            previewUrl: 'https://github.com/YuvisTechPoint/CivicTrust',
+            previewImage: 'Assets/images/previews/civictrust.webp',
+            label: 'github.com/YuvisTechPoint/CivicTrust',
+            previewBadge: 'Open Source',
             icon: 'ri-government-line',
             iconColor: 'text-neo-purple',
             sub: 'Decentralized Governance dApp'
         },
         {
             title: 'FortiFind',
+            role: 'Security Engineer',
+            highlights: [
+                'Custom ML model combined with Flawfinder and Bandit for vulnerability scanning.',
+                'Analyzes individual files or entire Git repositories across multiple languages.',
+                'Surfaces security issues for faster remediation in CI/CD workflows.'
+            ],
             desc: 'Comprehensive security vulnerability scanner using a custom ML model alongside Flawfinder and Bandit. Analyzes individual files or entire Git repositories across multiple programming languages.',
             tags: ['Python', 'ML', 'Flawfinder', 'Bandit', 'Security'],
             dataTags: 'security ai',
             stagger: true,
             hoverClass: 'group-hover:text-neo-pink',
             github: 'https://github.com/YuvisTechPoint/Vulnerability-scanner',
-            preview: 'github',
+            preview: 'screenshot',
+            previewUrl: 'https://github.com/YuvisTechPoint/Vulnerability-scanner',
+            previewImage: 'Assets/images/previews/fortifind.webp',
+            label: 'github.com/YuvisTechPoint/Vulnerability-scanner',
+            previewBadge: 'Open Source',
             icon: 'ri-shield-check-line',
             iconColor: 'text-neo-green',
             sub: 'ML Vulnerability Scanner'
@@ -155,7 +234,11 @@
             stagger: false,
             hoverClass: 'group-hover:text-neo-blue',
             github: 'https://github.com/YuvisTechPoint/SkillHive',
-            preview: 'github',
+            preview: 'screenshot',
+            previewUrl: 'https://github.com/YuvisTechPoint/SkillHive',
+            previewImage: 'Assets/images/previews/skillhive.webp',
+            label: 'github.com/YuvisTechPoint/SkillHive',
+            previewBadge: 'Demo Offline',
             icon: 'ri-graduation-cap-line',
             iconColor: 'text-neo-blue',
             sub: 'AI Learning Platform',
@@ -169,30 +252,51 @@
             stagger: true,
             hoverClass: 'group-hover:text-neo-orange',
             github: 'https://github.com/YuvisTechPoint/E-Signature',
-            preview: 'github',
+            preview: 'screenshot',
+            previewUrl: 'https://github.com/YuvisTechPoint/E-Signature',
+            previewImage: 'Assets/images/previews/e-signature.webp',
+            label: 'github.com/YuvisTechPoint/E-Signature',
+            previewBadge: 'Open Source',
             icon: 'ri-smartphone-line',
             iconColor: 'text-neo-yellow',
             sub: 'Offline PDF Scanner · Android'
         }
     ];
 
+    window.PORTFOLIO_PROJECTS = PROJECTS.map((p) => ({
+        ...p,
+        slug: projectSlug(p.title),
+        role: p.role || 'Full Stack Developer',
+        highlights: p.highlights || [p.desc]
+    }));
+
     function screenshotUrl(url) {
         return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
     }
 
+    function tagHtml(tags) {
+        return tags.map((t) => `<span class="bg-neo-black text-white px-2 py-1">${t}</span>`).join('');
+    }
+
     function livePreviewChrome(p) {
+        const badge = p.previewBadge || 'Live';
+        const badgeClass = p.previewBadge ? 'text-neo-yellow' : 'text-neo-green';
+        const href = p.live || p.github || '#';
         return `<div class="absolute inset-0 flex items-end justify-between p-3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-[3]">
  <span class="font-mono text-white text-xs uppercase font-bold">${p.label}</span>
- <span class="font-mono text-neo-green text-[10px] uppercase">Live</span>
+ <span class="font-mono ${badgeClass} text-[10px] uppercase">${badge}</span>
  </div>
- <a href="${p.live}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 z-[4]" aria-label="Open ${p.title} live site"></a>`;
+ <a href="${href}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 z-[4]" aria-label="Open ${p.title}"></a>`;
     }
 
     function previewHtml(p) {
-        if (p.preview === 'iframe' || p.preview === 'screenshot') {
-            return `<div class="project-live-preview block bg-black border-2 border-black aspect-video relative overflow-hidden mb-6 group-hover:shadow-none transition-all">
+        if (p.preview === 'screenshot' || p.previewImage) {
+            const imgAttrs = p.previewImage
+                ? `src="${p.previewImage}"`
+                : `data-shot-src="${p.previewUrl || p.live || ''}"`;
+            return `<div class="project-live-preview block bg-black border-2 border-black aspect-video relative overflow-hidden mb-6 group-hover:shadow-none transition-all${p.previewImage ? ' is-loaded' : ''}">
  <div class="project-preview-placeholder absolute inset-0 flex items-center justify-center bg-neo-blue/30 font-mono text-white text-sm uppercase z-0">${p.title} Preview</div>
- <img data-shot-src="${p.previewUrl}" alt="${p.title} live site preview" class="project-preview-shot absolute inset-0 w-full h-full object-cover object-top border-0 z-[2] pointer-events-none" decoding="async">
+ <img ${imgAttrs} alt="${p.title} preview" class="project-preview-shot absolute inset-0 w-full h-full object-cover object-top border-0 z-[2] pointer-events-none" decoding="async"${p.previewImage ? '' : ' loading="lazy"'}>
  ${livePreviewChrome(p)}
  </div>`;
         }
@@ -212,10 +316,6 @@
  </a>`;
     }
 
-    function tagHtml(tags) {
-        return tags.map((t) => `<span class="bg-neo-black text-white px-2 py-1">${t}</span>`).join('');
-    }
-
     const MAX_SHOT_LOADS = 2;
     let activeShotLoads = 0;
     const shotLoadQueue = [];
@@ -227,9 +327,19 @@
         }
     }
 
+    function canLoadExternalPreviews() {
+        const consent = window.ypGetConsent?.();
+        return consent !== 'decline';
+    }
+
     function loadScreenshot(img) {
         const url = img.dataset.shotSrc;
         if (!url) return;
+
+        if (!canLoadExternalPreviews()) {
+            finishShotLoad();
+            return;
+        }
 
         if (activeShotLoads >= MAX_SHOT_LOADS) {
             shotLoadQueue.push(img);
@@ -263,9 +373,18 @@
                 loadScreenshot(entry.target);
                 observer.unobserve(entry.target);
             });
-        }, { rootMargin: '120px', threshold: 0.01 });
+        }, { rootMargin: '200px', threshold: 0.01 });
 
-        shots.forEach((img) => observer.observe(img));
+        shots.forEach((img) => {
+            if (canLoadExternalPreviews()) loadScreenshot(img);
+            else observer.observe(img);
+        });
+    }
+
+    function projectPrimaryUrl(p) {
+        if (p.live) return p.live;
+        if (p.github) return p.github;
+        return '#';
     }
 
     window.renderProjectsGrid = function () {
@@ -280,23 +399,31 @@ ${previewHtml(p)}
 <p class="font-mono text-sm mb-4 max-w-xs">${p.desc}</p>
 <div class="flex gap-2 font-mono text-xs font-bold flex-wrap">${tagHtml(p.tags)}</div>
 </div>
-<a href="${p.github}" target="_blank" rel="noopener noreferrer"
- class="w-12 h-12 shrink-0 border-2 border-black bg-neo-green flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-hover shadow-hard-sm" title="View on GitHub">
+<div class="flex gap-2 shrink-0 self-start">
+<button type="button" class="project-details-btn px-3 py-2 border-2 border-black bg-neo-yellow font-mono text-xs font-bold hover:bg-black hover:text-white transition-all cursor-hover shadow-hard-sm" data-project-slug="${projectSlug(p.title)}" title="View project details">DETAILS</button>
+<a href="${projectPrimaryUrl(p)}" target="_blank" rel="noopener noreferrer"
+ class="w-12 h-12 border-2 border-black bg-neo-green flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-hover shadow-hard-sm" title="Open project">
 <i class="ri-arrow-right-up-line text-2xl"></i>
 </a>
 </div>
+</div>
 </article>`).join('');
+        if (!grid.dataset.detailsBound) {
+            grid.dataset.detailsBound = 'true';
+            grid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.project-details-btn');
+                if (!btn) return;
+                e.preventDefault();
+                window.openProjectModal?.(btn.dataset.projectSlug);
+            });
+        }
         initProjectPreviews();
-        document.querySelectorAll('#projects-grid .reveal').forEach((el) => {
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                        revealObserver.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-            revealObserver.observe(el);
-        });
+        window.ypRefreshCursorMirror?.();
+        window.observeReveals?.(grid);
     };
+
+    window.addEventListener('yp-consent-changed', (event) => {
+        if (event.detail?.choice === 'decline') return;
+        initProjectPreviews();
+    });
 })();

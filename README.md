@@ -1,6 +1,6 @@
 # Yuvraj Prasad — Portfolio Website
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Portfolio-blue?style=for-the-badge&logo=vercel)](https://yuvraj-prasad.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Portfolio-blue?style=for-the-badge&logo=vercel)](https://yuvrajprasad.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/YuvisTechPoint/Yuvraj-Portfolio)
 [![HTML5](https://img.shields.io/badge/HTML5-Single%20Page-orange?style=for-the-badge&logo=html5)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
@@ -9,7 +9,7 @@
 
 Neo-brutalist personal portfolio for **Yuvraj Prasad** — Full Stack Developer, **AI Product Engineer @ Mewayz**, co-founder, patent holder, and hackathon winner from Kolkata, India.
 
-**Live:** [yuvraj-prasad.vercel.app](https://yuvraj-prasad.vercel.app)
+**Live:** [yuvrajprasad.vercel.app](https://yuvrajprasad.vercel.app)
 
 ---
 
@@ -23,7 +23,7 @@ I'm **Yuvraj Prasad**, a versatile software developer and community builder spec
 - **Web3 & Blockchain** (Solidity, dApps, smart contracts)
 - **Community building, hackathons & technical leadership**
 
-**Currently:** AI Product Engineer @ **Mewayz Global Corporation** · Co-Founder @ **KomProTech** & **Apex Circle** · Fellowship @ **Keploy**
+**Currently:** AI Product Engineer @ **Mewayz Global Corporation** · Full Stack Developer @ **Orcrys Technologies** · Co-Founder @ **KomProTech**
 
 **Languages:** English · Hindi · Bengali  
 **Location:** Kolkata, West Bengal, India  
@@ -51,14 +51,14 @@ I'm **Yuvraj Prasad**, a versatile software developer and community builder spec
 | Role | Organization |
 | :--- | :--- |
 | AI Product Engineer | Mewayz Global Corporation |
+| Full Stack Developer | Orcrys Technologies Pvt. Ltd. |
 | Co-Founder | KomProTech |
-| Co-Founder | Apex Circle Official |
-| Founding Board Member | The Cosmos |
+| Co-Founder (ended Jun 2026) | Apex Circle Official |
 | Full Stack Developer | Phantom X |
-| Fellowship | Keploy |
-| Ex — Managing Lead | Repository |
-| Research Intern | AI & Image Processing |
-| Trainer Intern | MERN Stack |
+| Fellowship (ended Aug 2025) | Keploy |
+| Ex — Managing Lead (ended Apr 2026) | Repository |
+| Research Intern (ended Jul 2025) | AI & Image Processing |
+| Trainer Intern (ended Mar 2025) | MERN Stack |
 
 ---
 
@@ -86,7 +86,7 @@ I'm **Yuvraj Prasad**, a versatile software developer and community builder spec
 | :--- | :--- |
 | Core | HTML5 single-page app |
 | Styling | Tailwind CSS 3.4 (compiled) |
-| Scripting | Vanilla JS (`Assets/js/main.js`, `projects-data.js`) |
+| Scripting | Vanilla JS (`main.js`, `projects-data.js`, `premium.js`) |
 | Icons | Remix Icon |
 | Fonts | Space Grotesk + JetBrains Mono |
 | APIs | GitHub REST · LeetCode badges · LeetCard |
@@ -136,8 +136,8 @@ Projects are rendered from `Assets/js/projects-data.js` and support **tag filter
 - **Live GitHub stats** — repos, followers, join date, activity index
 - **LeetCode integration** — badges, heatmap (LeetCard), history marquee
 - **Project & achievement filters** — client-side tag/year/tier filtering
-- **Lazy iframe previews** — live site embeds load on scroll
-- **Contact form** — opens Gmail compose with prefilled message
+- **Lazy project previews** — static WebP screenshots for all projects; Microlink fallback when needed
+- **Contact form** — POST to `/api/contact` (Resend on Vercel) with mailto fallback when API is unavailable
 - **Copy to clipboard** — email and phone one-click copy
 - **Mobile hamburger menu** + skip-to-content link
 
@@ -199,31 +199,59 @@ npm install
 npm run build:css    # one-time compile
 npm run watch:css    # watch mode
 npm run optimize:images  # compress images via sharp
+npm run generate:og      # create og-banner.jpg for social previews
+npm run verify:assets    # check required deploy assets exist
+npm run predeploy        # build CSS + verify assets
 ```
+
+### Deploy to Vercel (production)
+
+1. Connect the repo to [Vercel](https://vercel.com).
+2. Set environment variables in the project dashboard:
+   - `RESEND_API_KEY` — required for contact form email delivery
+   - `CONTACT_FROM` — optional verified sender (defaults to Resend onboarding address)
+3. Deploy. CI runs `build:css` and `verify:assets` on push to `main`.
+4. Canonical URL: [https://yuvrajprasad.vercel.app/](https://yuvrajprasad.vercel.app/)
+
+### Premium stack (included)
+
+| Layer | Features |
+| :--- | :--- |
+| **Polish** | Boot loader, page fade-in, section-aware tab titles, print stylesheet |
+| **Share** | Web Share API + copy fallback; project deep links `#projects?project=slug` |
+| **Power user** | `Ctrl+K`, `/`, `?` shortcuts panel; expanded command palette |
+| **PWA** | `sw.js` offline shell, manifest shortcuts, installable on mobile |
+| **Performance** | Web Vitals → GTM (analytics consent); lazy consent-gated stat charts |
+| **Deploy** | `env.example`, `npm run verify:assets`, CI asset checks |
 
 ---
 
 ## Project Structure
 
 ```
-NeoBrutalist/
 ├── Assets/
 │   ├── css/
 │   │   ├── input.css          # Tailwind source
-│   │   └── main.css           # Compiled stylesheet (linked in index.html)
-│   ├── images/                # Avatar, favicon, title icon
+│   │   └── main.css           # Compiled stylesheet
+│   ├── images/
+│   │   ├── previews/          # Project card WebP screenshots
+│   │   └── …                  # Avatar, favicon, OG banner
 │   ├── js/
-│   │   ├── main.js            # Cursor, scroll, APIs, contact, themes
-│   │   └── projects-data.js   # Project cards (data-driven)
+│   │   ├── main.js            # Cursor magnifier, scroll, APIs, contact
+│   │   ├── projects-data.js   # Project cards (data-driven)
+│   │   └── premium.js         # Boot loader, SW, consent media, share
 │   └── Resume/
-│       └── Yuvraj Prasad CV.pdf
+├── api/
+│   └── contact.js             # Resend email handler (Vercel serverless)
 ├── scripts/
-│   └── optimize-images.mjs    # Image optimization script
-├── index.html                 # Single-page entry point
-├── package.json               # Tailwind build scripts
-├── robots.txt
-├── tailwind.config.js
-└── README.md
+│   ├── verify-assets.mjs      # Pre-deploy asset checks
+│   └── generate-project-previews.mjs
+├── index.html
+├── 404.html
+├── privacy.html
+├── sw.js                      # Service worker (PWA)
+├── vercel.json
+└── package.json
 ```
 
 ---
@@ -282,14 +310,14 @@ Oct 2022 — Aug 2026
 | :--- | :--- |
 | **Email** | [prasadyuvraj8805@gmail.com](mailto:prasadyuvraj8805@gmail.com) |
 | **Phone** | +91 62911 29896 |
-| **Website** | [yuvraj-prasad.vercel.app](https://yuvraj-prasad.vercel.app/) |
+| **Website** | [yuvrajprasad.vercel.app](https://yuvrajprasad.vercel.app/) |
 
 ---
 
 ## Design Philosophy
 
 - **Neo-Brutalism** — raw typography, asymmetry, hard shadows, unapologetic contrast
-- **Performance first** — no React, no build step required to deploy
+- **Performance first** — static HTML/CSS/JS; Tailwind build + asset verification in CI
 - **Mobile-first** — responsive nav, touch-friendly interactions
 - **Content-driven** — projects and stats loaded from structured data where possible
 - **Accessible** — reduced-motion support, semantic landmarks, keyboard navigation

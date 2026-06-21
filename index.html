@@ -20,9 +20,9 @@
  <meta property="og:title" content="YUVRAJ PRASAD | AI Product Engineer & Full Stack Developer">
  <meta property="og:description"
  content="AI Product Engineer @ Mewayz · Full Stack Developer · 10+ hackathon wins · Patent holder · Kolkata, India">
- <meta property="og:image" content="https://yuvrajprasad.vercel.app/Assets/images/title_icon.png">
- <meta property="og:image:width" content="512">
- <meta property="og:image:height" content="512">
+ <meta property="og:image" content="https://yuvrajprasad.vercel.app/Assets/images/og-banner.jpg">
+ <meta property="og:image:width" content="1200">
+ <meta property="og:image:height" content="630">
  <meta property="og:image:alt" content="Yuvraj Prasad - Full Stack Developer">
 
  <!-- Twitter -->
@@ -31,7 +31,7 @@
  <meta property="twitter:title" content="YUVRAJ PRASAD | AI Product Engineer & Full Stack Developer">
  <meta property="twitter:description"
  content="AI Product Engineer @ Mewayz · Full Stack Developer · 10+ hackathon wins · Patent holder · Kolkata, India">
- <meta property="twitter:image" content="https://yuvrajprasad.vercel.app/Assets/images/title_icon.png">
+ <meta property="twitter:image" content="https://yuvrajprasad.vercel.app/Assets/images/og-banner.jpg">
 
  <title>YUVRAJ PRASAD | AI Product Engineer & Full Stack Developer</title>
 
@@ -40,6 +40,13 @@
 
  <!-- Theme & Performance -->
  <meta name="theme-color" content="#121212">
+ <meta name="site-version" content="2026.06.1">
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-title" content="Yuvraj Prasad">
+ <meta name="format-detection" content="telephone=no">
+ <link rel="me" href="https://github.com/YuvisTechPoint">
+ <link rel="me" href="https://www.linkedin.com/in/yuvrajprasad">
+ <link rel="me" href="https://x.com/YuvisTechPoint/">
  <link rel="preload" href="Assets/css/main.css" as="style">
  <link rel="preload" href="Assets/images/Yuvraj%20image.webp" as="image" type="image/webp" fetchpriority="high">
  <link rel="preload"
@@ -55,7 +62,7 @@
  "url": "https://yuvrajprasad.vercel.app/",
  "jobTitle": "AI Product Engineer & Full Stack Developer",
  "email": "prasadyuvraj8805@gmail.com",
- "image": "https://yuvrajprasad.vercel.app/Assets/images/Yuvraj%20image.jpeg",
+ "image": "https://yuvrajprasad.vercel.app/Assets/images/Yuvraj%20image.webp",
  "address": {
  "@type": "PostalAddress",
  "addressLocality": "Kolkata",
@@ -74,6 +81,17 @@
  "description": "AI Product Engineer at Mewayz and Full Stack Developer from Kolkata. MERN, Java, Python, AI/ML, Web3. Co-founder, patent holder, and hackathon winner."
  }
  </script>
+ <script type="application/ld+json">
+ {
+ "@context": "https://schema.org",
+ "@type": "WebSite",
+ "name": "Yuvraj Prasad Portfolio",
+ "url": "https://yuvrajprasad.vercel.app/",
+ "description": "Official portfolio of Yuvraj Prasad — AI Product Engineer and Full Stack Developer.",
+ "inLanguage": "en-IN",
+ "author": { "@type": "Person", "name": "Yuvraj Prasad" }
+ }
+ </script>
 
  <link href="Assets/css/main.css" rel="stylesheet">
 
@@ -90,6 +108,8 @@
 
  <link rel="icon" type="image/png" href="Assets/images/title_icon.png">
  <link rel="icon" type="image/svg+xml" href="Assets/images/favicon.svg">
+ <link rel="apple-touch-icon" href="Assets/images/title_icon.png">
+ <link rel="manifest" href="/site.webmanifest">
 
  <style>
  /* Base Styles */
@@ -129,7 +149,7 @@
  }
  }
 
- /* Custom Cursor */
+ /* Custom Cursor — magnifier lens on interactive elements */
  #cursor {
  pointer-events: none;
  position: fixed;
@@ -141,7 +161,7 @@
  background: #fff;
  mix-blend-mode: difference;
  transform: translate(-50%, -50%);
- transition: width 0.2s, height 0.2s, background-color 0.2s;
+ transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
  }
 
  #cursor.cursor-expanded {
@@ -198,7 +218,6 @@
  transform-origin: 0 0;
  will-change: transform;
  pointer-events: none;
- overflow: visible;
  backface-visibility: hidden;
  }
 
@@ -338,6 +357,26 @@
 
  .profile-flip-card:hover .profile-flip-front img,
  .profile-flip-card:hover .profile-flip-back img {
+ transform: none;
+ }
+
+ #page-loader .boot-progress__fill {
+ transition: none;
+ }
+
+ #page-loader .boot-log__line {
+ opacity: 1;
+ transform: none;
+ animation: none;
+ }
+
+ #page-loader .boot-cursor {
+ animation: none;
+ }
+
+ body:not(.page-ready) #main-content,
+ body.page-ready #main-content {
+ opacity: 1;
  transform: none;
  }
  }
@@ -738,7 +777,7 @@
  #contact .contact-badge {
  position: absolute;
  top: -2.5rem;
- left: 0.25rem;
+ left: 1.95rem;
  margin-bottom: 0;
  }
 
@@ -1547,6 +1586,10 @@
  align-self: flex-start;
  }
 
+ .role-date-badge--past {
+ background-color: #4b5563;
+ }
+
  .role-card-header {
  display: flex;
  flex-direction: column;
@@ -1855,6 +1898,66 @@
  opacity: 0;
  }
 
+ #project-modal {
+ position: fixed;
+ inset: 0;
+ z-index: 9996;
+ display: none;
+ align-items: center;
+ justify-content: center;
+ padding: 1rem;
+ background: rgba(18, 18, 18, 0.85);
+ }
+
+ #project-modal.open { display: flex; }
+
+ #project-modal-panel {
+ width: min(42rem, 96vw);
+ max-height: min(85vh, 820px);
+ border: 4px solid #121212;
+ box-shadow: 12px 12px 0 #121212;
+ background: #fff;
+ display: flex;
+ flex-direction: column;
+ overflow: hidden;
+ }
+
+ #project-modal-body {
+ flex: 1 1 auto;
+ min-height: 0;
+ overflow-y: auto;
+ padding: 1.25rem 1.5rem 1.5rem;
+ }
+
+ .project-modal-highlights li {
+ position: relative;
+ padding-left: 1rem;
+ }
+
+ .project-modal-highlights li::before {
+ content: '>';
+ position: absolute;
+ left: 0;
+ color: #33FF57;
+ font-weight: 700;
+ }
+
+ #open-command-palette-btn {
+ font-family: "JetBrains Mono", monospace;
+ font-size: 0.65rem;
+ font-weight: 700;
+ padding: 0.35rem 0.5rem;
+ border: 2px solid #121212;
+ background: #fff;
+ box-shadow: 2px 2px 0 #121212;
+ }
+
+ #open-command-palette-btn:hover {
+ background: #FBFF48;
+ transform: translate(1px, 1px);
+ box-shadow: 1px 1px 0 #121212;
+ }
+
  @media (max-width: 767px) {
  #cv-modal {
  align-items: flex-end;
@@ -1891,22 +1994,368 @@
  text-align: center;
  }
 
- @media (min-width: 768px) {
- .hero-cta {
+ .hero-cta-row .hero-cta {
+ min-height: 3.25rem;
+ }
+
+ @media (min-width: 640px) {
+ .hero-cta-row .hero-cta {
  width: auto;
- max-width: none;
+ flex: 1 1 calc(50% - 0.5rem);
+ max-width: 14rem;
  margin-left: 0;
  margin-right: 0;
+ }
+ }
+
+ @media (min-width: 768px) {
+ .hero-cta-row .hero-cta {
+ flex: 1 1 auto;
+ max-width: none;
+ min-width: 10.5rem;
+ }
+ }
+
+ /* Premium: boot terminal loader */
+ #page-loader {
+ position: fixed;
+ inset: 0;
+ z-index: 10000;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ padding: 1.25rem;
+ background: #0a0a0a;
+ color: #33FF57;
+ font-family: "JetBrains Mono", ui-monospace, monospace;
+ transition: opacity 0.45s ease, visibility 0.45s ease;
+ overflow: hidden;
+ cursor: default;
+ }
+
+ /* System cursor during boot — custom cursor sits below loader (z-index 9999) */
+ body.boot-loading {
+ cursor: auto !important;
+ }
+
+ body.boot-loading #cursor {
+ display: none !important;
+ }
+
+ #page-loader .boot-terminal,
+ #page-loader .boot-terminal * {
+ cursor: inherit;
+ }
+
+ #page-loader::before {
+ content: "";
+ position: absolute;
+ inset: 0;
+ background-image:
+ radial-gradient(rgba(51, 255, 87, 0.07) 1px, transparent 1px),
+ linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+ linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+ background-size: 24px 24px, 48px 48px, 48px 48px;
+ pointer-events: none;
+ }
+
+ #page-loader::after {
+ content: "";
+ position: absolute;
+ inset: 0;
+ background: repeating-linear-gradient(
+ 0deg,
+ transparent,
+ transparent 2px,
+ rgba(0, 0, 0, 0.12) 2px,
+ rgba(0, 0, 0, 0.12) 4px
+ );
+ pointer-events: none;
+ opacity: 0.35;
+ }
+
+ #page-loader.page-loader--hide {
+ opacity: 0;
+ visibility: hidden;
+ pointer-events: none;
+ }
+
+ .boot-terminal {
+ position: relative;
+ z-index: 1;
+ width: min(26rem, 92vw);
+ border: 3px solid #33FF57;
+ background: rgba(8, 8, 8, 0.96);
+ box-shadow:
+ 0 0 40px rgba(51, 255, 87, 0.12),
+ 8px 8px 0 rgba(51, 255, 87, 0.35);
+ }
+
+ .boot-terminal__chrome {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 0.75rem;
+ padding: 0.5rem 0.75rem;
+ border-bottom: 2px solid rgba(51, 255, 87, 0.35);
+ background: linear-gradient(180deg, rgba(51, 255, 87, 0.08) 0%, transparent 100%);
+ }
+
+ .boot-terminal__dots {
+ display: flex;
+ gap: 0.35rem;
+ }
+
+ .boot-terminal__dots span {
+ width: 0.55rem;
+ height: 0.55rem;
+ border: 1px solid #121212;
+ border-radius: 50%;
+ }
+
+ .boot-terminal__dots span:nth-child(1) { background: #FF2A2A; }
+ .boot-terminal__dots span:nth-child(2) { background: #FBFF48; }
+ .boot-terminal__dots span:nth-child(3) { background: #33FF57; }
+
+ .boot-terminal__title {
+ font-size: 0.625rem;
+ font-weight: 700;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ color: rgba(51, 255, 87, 0.85);
+ text-shadow: 0 0 12px rgba(51, 255, 87, 0.35);
+ }
+
+ .boot-terminal__body {
+ padding: 1rem 1rem 0.875rem;
+ min-height: 11rem;
+ }
+
+ .boot-log {
+ display: flex;
+ flex-direction: column;
+ gap: 0.35rem;
+ min-height: 7.5rem;
+ margin-bottom: 0.875rem;
+ font-size: 0.6875rem;
+ line-height: 1.45;
+ }
+
+ .boot-log__line {
+ opacity: 0;
+ transform: translateY(4px);
+ animation: boot-line-in 0.35s ease forwards;
+ }
+
+ @keyframes boot-line-in {
+ to {
+ opacity: 1;
+ transform: translateY(0);
+ }
+ }
+
+ .boot-log__prompt {
+ color: #FBFF48;
+ font-weight: 700;
+ margin-right: 0.25rem;
+ }
+
+ .boot-log__text {
+ color: #e8ffe8;
+ }
+
+ .boot-log__meta {
+ color: rgba(51, 255, 87, 0.55);
+ font-size: 0.625rem;
+ margin-left: 0.25rem;
+ }
+
+ .boot-progress {
+ display: flex;
+ align-items: center;
+ gap: 0.625rem;
+ margin-bottom: 0.625rem;
+ }
+
+ .boot-progress__track {
+ flex: 1;
+ height: 8px;
+ border: 2px solid rgba(51, 255, 87, 0.5);
+ background: #000;
+ overflow: hidden;
+ }
+
+ .boot-progress__fill {
+ display: block;
+ height: 100%;
+ width: 0%;
+ background: linear-gradient(90deg, #1a9929 0%, #33FF57 50%, #7dff9a 100%);
+ box-shadow: 0 0 10px rgba(51, 255, 87, 0.6);
+ transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+ }
+
+ .boot-progress__pct {
+ min-width: 2.5rem;
+ font-size: 0.625rem;
+ font-weight: 700;
+ letter-spacing: 0.08em;
+ color: #FBFF48;
+ text-align: right;
+ }
+
+ .boot-status {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 0.75rem;
+ font-size: 0.625rem;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
+ color: rgba(51, 255, 87, 0.75);
+ }
+
+ .boot-cursor {
+ display: inline-block;
+ margin-left: 2px;
+ animation: boot-blink 1s step-end infinite;
+ color: #33FF57;
+ }
+
+ @keyframes boot-blink {
+ 50% { opacity: 0; }
+ }
+
+ #boot-skip {
+ font: inherit;
+ font-size: 0.5625rem;
+ font-weight: 700;
+ letter-spacing: 0.14em;
+ text-transform: uppercase;
+ padding: 0.25rem 0.5rem;
+ border: 1px solid rgba(51, 255, 87, 0.45);
+ background: transparent;
+ color: rgba(51, 255, 87, 0.7);
+ cursor: pointer;
+ transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+ pointer-events: auto;
+ position: relative;
+ z-index: 2;
+ }
+
+ #boot-skip:hover {
+ background: rgba(51, 255, 87, 0.12);
+ color: #33FF57;
+ border-color: #33FF57;
+ }
+
+ body:not(.page-ready) #main-content {
+ opacity: 0;
+ transform: translateY(10px);
+ }
+
+ body.page-ready #main-content {
+ opacity: 1;
+ transform: none;
+ transition: opacity 0.5s ease, transform 0.5s ease;
+ }
+
+ #shortcuts-modal {
+ position: fixed;
+ inset: 0;
+ z-index: 9995;
+ display: none;
+ align-items: center;
+ justify-content: center;
+ padding: 1rem;
+ background: rgba(18, 18, 18, 0.88);
+ }
+
+ #shortcuts-modal.open { display: flex; }
+
+ #shortcuts-modal-panel {
+ width: min(28rem, 96vw);
+ border: 4px solid #121212;
+ box-shadow: 10px 10px 0 #121212;
+ background: #fff;
+ padding: 1.25rem 1.5rem 1.5rem;
+ font-family: "JetBrains Mono", monospace;
+ }
+
+ .shortcuts-list {
+ list-style: none;
+ padding: 0;
+ margin: 1rem 0 0;
+ }
+
+ .shortcuts-list li {
+ display: flex;
+ justify-content: space-between;
+ gap: 1rem;
+ padding: 0.5rem 0;
+ border-bottom: 1px solid #e5e5e5;
+ font-size: 0.75rem;
+ }
+
+ .shortcuts-list kbd {
+ background: #121212;
+ color: #FBFF48;
+ padding: 0.15rem 0.4rem;
+ border: 2px solid #121212;
+ font-weight: 700;
+ white-space: nowrap;
+ }
+
+ :focus-visible {
+ outline: 3px solid #33FF57;
+ outline-offset: 2px;
+ }
+
+ @media print {
+ #cursor, #page-loader, #cookie-consent, #command-palette, #shortcuts-modal,
+ #cv-modal, #project-modal, #sticky-hire-bar, #section-rail, #back-to-top,
+ #progressBar, #site-toast, nav, .marquee-container, .hero-ticker {
+ display: none !important;
+ }
+
+ body {
+ cursor: auto !important;
+ background: #fff !important;
+ color: #000 !important;
+ }
+
+ #main-content {
+ opacity: 1 !important;
+ transform: none !important;
  }
  }
  </style>
 </head>
 
-<body class="text-neo-black font-display antialiased selection:bg-neo-black selection:text-neo-yellow">
- <!-- Google Tag Manager (noscript) -->
- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TLNG322R" height="0" width="0"
- style="display:none;visibility:hidden"></iframe></noscript>
- <!-- End Google Tag Manager (noscript) -->
+<body class="text-neo-black font-display antialiased selection:bg-neo-black selection:text-neo-yellow boot-loading">
+
+ <div id="page-loader" role="status" aria-live="polite" aria-label="Loading portfolio" aria-busy="true">
+ <div class="boot-terminal">
+ <div class="boot-terminal__chrome">
+ <div class="boot-terminal__dots" aria-hidden="true"><span></span><span></span><span></span></div>
+ <span class="boot-terminal__title">YUVRAJ.exe // boot_sequence</span>
+ </div>
+ <div class="boot-terminal__body">
+ <div id="boot-log" class="boot-log" aria-label="Boot log"></div>
+ <div class="boot-progress">
+ <div class="boot-progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Loading progress">
+ <span id="boot-progress-fill" class="boot-progress__fill"></span>
+ </div>
+ <span id="boot-progress-pct" class="boot-progress__pct">0%</span>
+ </div>
+ <div class="boot-status">
+ <span id="boot-status-line">INIT<span class="boot-cursor" aria-hidden="true">_</span></span>
+ <button type="button" id="boot-skip">SKIP [ESC]</button>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- GTM loads only after analytics consent via main.js (no noscript fallback) -->
 
  <a href="#main-content" class="skip-link cursor-hover">Skip to content</a>
 
@@ -1922,7 +2371,7 @@
  <i class="ri-arrow-up-line text-xl"></i>
  </button>
 
- <div class="fixed top-0 left-0 h-2 z-[60] border-b-2 border-black transition-colors duration-350" id="progressBar" style="width: 0%; background-color: var(--scroll-accent, #33FF57);">
+ <div class="fixed top-0 left-0 h-2 z-[60] border-b-2 border-black transition-colors duration-350" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Page scroll progress" style="width: 0%; background-color: var(--scroll-accent, #33FF57);">
  </div>
 
  <div id="site-toast" role="status" aria-live="polite"></div>
@@ -1933,17 +2382,22 @@
  <button type="button" data-consent="all" class="cookie-btn cookie-btn--full cursor-hover">ACCEPT COOKIES &amp; CACHE</button>
  <button type="button" data-consent="essential" class="cookie-btn cookie-btn--dark cursor-hover">ESSENTIAL ONLY</button>
  <button type="button" data-consent="decline" class="cookie-btn cookie-btn--light cursor-hover">DECLINE OPTIONAL</button>
+ <a href="privacy.html" class="cookie-btn cookie-btn--half cursor-hover text-center">PRIVACY</a>
  <a href="#contact" class="cookie-btn cookie-btn--half cursor-hover">CONTACT</a>
  </div>
  </div>
 
  <nav id="section-rail" aria-label="Section navigation">
- <a href="#about" class="section-rail-dot" data-rail="about" title="About"></a>
- <a href="#skills" class="section-rail-dot" data-rail="skills" title="Skills"></a>
- <a href="#experience" class="section-rail-dot" data-rail="experience" title="Experience"></a>
- <a href="#projects" class="section-rail-dot" data-rail="projects" title="Projects"></a>
- <a href="#reports" class="section-rail-dot" data-rail="reports" title="Wins"></a>
- <a href="#contact" class="section-rail-dot" data-rail="contact" title="Contact"></a>
+ <a href="#about" class="section-rail-dot" data-rail="about" title="About" aria-label="About section"></a>
+ <a href="#skills" class="section-rail-dot" data-rail="skills" title="Skills" aria-label="Skills section"></a>
+ <a href="#experience" class="section-rail-dot" data-rail="experience" title="Experience" aria-label="Experience section"></a>
+ <a href="#education" class="section-rail-dot" data-rail="education" title="Education" aria-label="Education section"></a>
+ <a href="#coding-stats" class="section-rail-dot" data-rail="coding-stats" title="Coding stats" aria-label="Coding stats section"></a>
+ <a href="#projects" class="section-rail-dot" data-rail="projects" title="Projects" aria-label="Projects section"></a>
+ <a href="#achievements" class="section-rail-dot" data-rail="achievements" title="Achievements" aria-label="Achievements section"></a>
+ <a href="#intellectual-property" class="section-rail-dot" data-rail="intellectual-property" title="Patent" aria-label="Intellectual property section"></a>
+ <a href="#reports" class="section-rail-dot" data-rail="reports" title="Wins" aria-label="Portfolio wins section"></a>
+ <a href="#contact" class="section-rail-dot" data-rail="contact" title="Contact" aria-label="Contact section"></a>
  </nav>
 
  <div id="sticky-hire-bar" class="font-mono font-bold flex flex-nowrap items-center gap-2 md:justify-end md:text-xs" role="navigation" aria-label="Quick links">
@@ -1953,6 +2407,8 @@
  <a href="#experience" class="sticky-hire-extra bg-white text-black px-2 py-1 border-2 border-black hover:bg-neo-purple hover:text-white transition-colors cursor-hover shrink-0">LOGS</a>
  <a href="#projects" class="sticky-hire-extra bg-white text-black px-2 py-1 border-2 border-black hover:bg-neo-pink hover:text-black transition-colors cursor-hover shrink-0">WORK</a>
  <a href="#reports" class="sticky-hire-extra bg-white text-black px-2 py-1 border-2 border-black hover:bg-neo-red hover:text-white transition-colors cursor-hover shrink-0">WINS</a>
+ <button type="button" id="sticky-share-btn" data-track="share_portfolio"
+ class="sticky-hire-extra bg-neo-yellow text-black px-2 py-1 border-2 border-black hover:bg-neo-pink transition-colors cursor-hover shrink-0" title="Share portfolio"><span class="sticky-hire-label--short">SHARE</span><span class="sticky-hire-label--long">SHARE</span></button>
  <button type="button" id="sticky-preview-cv" data-track="cv_preview"
  class="bg-white text-black px-2 py-1 border-2 border-black hover:bg-neo-pink transition-colors cursor-hover shrink-0"><span class="sticky-hire-label--short">VIEW</span><span class="sticky-hire-label--long">PREVIEW CV</span></button>
  <a href="https://github.com/YuvisTechPoint" target="_blank" rel="noopener noreferrer" data-track="sticky_github"
@@ -1967,6 +2423,32 @@
  <div id="command-palette-box">
  <input type="text" id="command-palette-input" placeholder="> type a command..." autocomplete="off" spellcheck="false">
  <div id="command-palette-list"></div>
+ </div>
+ </div>
+
+ <div id="project-modal" role="dialog" aria-modal="true" aria-labelledby="project-modal-title" hidden>
+ <div id="project-modal-panel">
+ <div class="flex items-center justify-between gap-2 p-3 border-b-4 border-black bg-neo-blue font-mono font-bold text-sm">
+ <span id="project-modal-title">PROJECT_DETAILS.txt</span>
+ <button type="button" id="project-modal-close" class="px-3 py-1 bg-neo-red text-white border-2 border-black">CLOSE</button>
+ </div>
+ <div id="project-modal-body"></div>
+ </div>
+ </div>
+
+ <div id="shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title" hidden>
+ <div id="shortcuts-modal-panel">
+ <div class="flex items-center justify-between gap-2 mb-2">
+ <h2 id="shortcuts-modal-title" class="font-black uppercase text-sm">Keyboard Shortcuts</h2>
+ <button type="button" id="shortcuts-modal-close" class="px-3 py-1 bg-neo-red text-white border-2 border-black font-mono text-xs font-bold">CLOSE</button>
+ </div>
+ <ul class="shortcuts-list">
+ <li><span>Command palette</span><kbd>Ctrl K</kbd></li>
+ <li><span>Command palette</span><kbd>/</kbd></li>
+ <li><span>Shortcuts help</span><kbd>?</kbd></li>
+ <li><span>Close modal / menu</span><kbd>Esc</kbd></li>
+ <li><span>Navigate commands</span><kbd>↑ ↓ Enter</kbd></li>
+ </ul>
  </div>
  </div>
 
@@ -2015,7 +2497,7 @@
  <i class="ri-menu-line text-2xl" id="mobile-menu-icon"></i>
  </button>
 
- <div id="desktop-nav-panel" class="hidden md:flex">
+ <div id="desktop-nav-panel" class="hidden md:flex items-center gap-1">
  <a href="#about" data-nav="about"
  class="nav-link hover:bg-black hover:text-white cursor-hover">/ABOUT</a>
  <a href="#skills" data-nav="skills"
@@ -2026,6 +2508,14 @@
  class="nav-link hover:bg-black hover:text-white cursor-hover">/WORK</a>
  <a href="#reports" data-nav="reports"
  class="nav-link hover:bg-black hover:text-white cursor-hover">/WINS</a>
+ <button type="button" id="open-shortcuts-btn"
+ class="hidden lg:inline-flex items-center gap-1 cursor-hover shrink-0 font-mono text-[10px] font-bold border-2 border-black px-2 py-1 bg-white hover:bg-neo-yellow"
+ title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">?</button>
+ <button type="button" id="open-command-palette-btn"
+ class="hidden lg:inline-flex items-center gap-1 cursor-hover shrink-0"
+ title="Command palette (Ctrl+K)" aria-label="Open command palette">
+ <i class="ri-command-line"></i> CTRL+K
+ </button>
  <a href="#contact" data-nav="contact"
  class="nav-link nav-hire-btn hire-me-cta cursor-hover" aria-label="Hire me — go to contact">HIRE&nbsp;ME</a>
  </div>
@@ -2074,18 +2564,21 @@
  <span class="text-neo-green">OPEN FOR WORK</span>
  </div>
 
- <div class="flex flex-col md:flex-row justify-center items-stretch md:items-center gap-4 md:gap-6 reveal mb-6 md:mb-8 w-full max-w-4xl mx-auto">
+ <div class="hero-cta-row flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-3 sm:gap-4 reveal mb-6 md:mb-8 w-full max-w-5xl mx-auto">
  <a href="#projects"
- class="hero-cta bg-black text-white border-2 border-black px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-xl font-bold shadow-hard hover:bg-neo-green hover:text-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
+ class="hero-cta bg-black text-white border-2 border-black px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg font-bold shadow-hard hover:bg-neo-green hover:text-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
  VIEW PROJECTS
  </a>
  <button type="button" id="hero-preview-cv" data-track="cv_preview"
- class="hero-cta bg-neo-white text-black border-2 border-black px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-xl font-bold shadow-hard hover:bg-neo-blue hover:text-white hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-hover flex items-center justify-center gap-2">
+ class="hero-cta bg-neo-white text-black border-2 border-black px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg font-bold shadow-hard hover:bg-neo-blue hover:text-white hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-hover flex items-center justify-center gap-2">
  <i class="ri-file-text-line"></i> PREVIEW CV
  </button>
- <a href="Assets/Resume/Yuvraj%20Prasad%20CV.pdf" download data-track="cv_download"
- class="hero-cta bg-neo-white text-black border-2 border-black px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-xl font-bold shadow-hard hover:bg-neo-pink hover:text-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-hover flex items-center justify-center gap-2">
- <i class="ri-download-line"></i> DOWNLOAD CV
+ <button type="button" id="hero-share-btn" data-track="share_portfolio"
+ class="hero-cta bg-neo-yellow text-black border-2 border-black px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg font-bold shadow-hard hover:bg-neo-green hover:text-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-hover flex items-center justify-center gap-2 whitespace-nowrap">
+ <i class="ri-share-forward-line" aria-hidden="true"></i> SHARE
+ </button>
+ <a href="#contact" class="hero-cta bg-neo-blue text-white border-2 border-black px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg font-bold shadow-hard hover:bg-neo-black hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-hover flex items-center justify-center gap-2 hire-me-cta whitespace-nowrap">
+ <i class="ri-mail-send-line" aria-hidden="true"></i> HIRE ME
  </a>
  </div>
  </div>
@@ -2149,7 +2642,7 @@
  </p>
  <p class="about-highlights font-mono text-sm sm:text-base md:text-lg mb-6 md:mb-8 text-gray-600 border-l-4 border-neo-purple pl-4">
  > Specialized in MERN Stack, AI/ML, Web3, and System Design.<br>
- > Co-Founder @ Apex Circle | AI Product Engineer @ Mewayz Global Corporation.<br>
+ > Full Stack Developer @ Orcrys Technologies | AI Product Engineer @ Mewayz Global Corporation.<br>
  > Patent Holder - Government of India Patent Office (2025).<br>
  > 10+ Hackathon Wins across India's top competitions.<br>
  > Languages: English, Hindi, Bengali.<br>
@@ -2354,11 +2847,26 @@
 
  <div class="log-timeline">
  <div class="reveal log-entry">
+ <div class="log-entry-marker bg-neo-orange"></div>
+ <div class="log-card bg-white">
+ <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
+ <h3 class="log-card-title">Full Stack Developer</h3>
+ <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">JUL 2026 - PRESENT</span>
+ </div>
+ <p class="log-card-meta text-neo-purple">@ Orcrys Technologies Pvt. Ltd. | Full-time | Kolkata</p>
+ <ul class="log-card-list">
+ <li>Building AI-powered products across the Orcrys venture ecosystem — aligned with Mewayz and Edquate.</li>
+ <li>Full-stack development for enterprise AI pipelines and cloud-native digital systems.</li>
+ </ul>
+ </div>
+ </div>
+
+ <div class="reveal log-entry">
  <div class="log-entry-marker bg-neo-purple"></div>
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Co-Founder</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">FEB 2025 - PRESENT</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">FEB 2025 - JUN 2026</span>
  </div>
  <p class="log-card-meta text-neo-purple">@ Apex Circle Official | Full-time</p>
  <ul class="log-card-list">
@@ -2385,27 +2893,11 @@
  </div>
 
  <div class="reveal log-entry">
- <div class="log-entry-marker bg-neo-red"></div>
- <div class="log-card bg-white">
- <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
- <h3 class="log-card-title">Founding Board Member</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">JUL 2025 - PRESENT</span>
- </div>
- <p class="log-card-meta text-neo-red">@ The Cosmos | Full-time | On-site, Kolkata</p>
- <ul class="log-card-list">
- <li>Debating society in association with Model United Nations (MUN).</li>
- <li>Establishing strategic direction for an intellectual platform fostering critical thinking and diplomatic discourse.</li>
- <li>Skills: Public Speaking | Debate | MUN | Leadership</li>
- </ul>
- </div>
- </div>
-
- <div class="reveal log-entry">
  <div class="log-entry-marker bg-neo-green"></div>
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Full Stack Developer</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">AUG 2025 - NOV 2025</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">AUG 2025 - NOV 2025</span>
  </div>
  <p class="log-card-meta text-neo-green">@ Phantom X | Full-time</p>
  <ul class="log-card-list">
@@ -2420,7 +2912,7 @@
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Fellowship</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">MAY 2025 - AUG 2025</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">MAY 2025 - AUG 2025</span>
  </div>
  <p class="log-card-meta text-neo-orange">@ Keploy | Part-time | Remote, Bengaluru</p>
  <ul class="log-card-list">
@@ -2435,7 +2927,7 @@
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Ex - Managing Lead</h3>
- <span class="font-mono font-bold bg-gray-600 text-white px-2 py-1">MAY 2025 - APR 2026</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">MAY 2025 - APR 2026</span>
  </div>
  <p class="log-card-meta text-neo-blue">@ Repository | Part-time | Kolkata</p>
  <ul class="log-card-list">
@@ -2451,7 +2943,7 @@
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Research Intern - AI & Image Processing</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">MAR 2025 - JUL 2025</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">MAR 2025 - JUL 2025</span>
  </div>
  <p class="log-card-meta text-neo-yellow">@ A.K. Choudhury School of IT, University of Calcutta</p>
  <ul class="log-card-list">
@@ -2466,7 +2958,7 @@
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Trainer Intern - MERN Stack</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">FEB 2025 - MAR 2025</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">FEB 2025 - MAR 2025</span>
  </div>
  <p class="log-card-meta text-neo-red">@ Kannovac Technology | Kolkata</p>
  <ul class="log-card-list">
@@ -2481,7 +2973,7 @@
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Core Member</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">SEP 2024 - PRESENT</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">SEP 2024 - SEP 2025</span>
  </div>
  <p class="log-card-meta text-neo-green">@ ACM (Association for Computing Machinery) | Kolkata</p>
  <ul class="log-card-list">
@@ -2515,7 +3007,7 @@
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Higher Secondary (Class XII) - Science with Computer Science</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">APR 2018 - AUG 2022</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">APR 2018 - AUG 2022</span>
  </div>
  <p class="log-card-meta text-neo-green">Rose Bank Edu-Care High School</p>
  </div>
@@ -2526,7 +3018,7 @@
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
  <h3 class="log-card-title">Secondary (Class X) - Science with Computer Application</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">MAR 2008 - MAR 2018</span>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">MAR 2008 - MAR 2018</span>
  </div>
  <p class="log-card-meta text-neo-purple"><a href="https://www.stjudeshighschool.com/" target="_blank" rel="noopener noreferrer" class="underline decoration-2 underline-offset-4 hover:bg-neo-purple hover:text-white transition-colors cursor-hover">St. Jude's High School</a></p>
  </div>
@@ -2672,6 +3164,11 @@
  </div>
  </div>
 
+ <div id="gh-recent-activity" class="mb-6 border-2 border-white/20 bg-neo-black/60 p-4" aria-live="polite">
+ <div class="text-[9px] font-mono text-neo-green uppercase tracking-widest opacity-70 mb-3">Recent_Pushes</div>
+ <p class="font-mono text-xs text-gray-500">Loading recent repositories...</p>
+ </div>
+
  <!-- Activity Graph parallel to LeetCode Heatmap -->
  <div class="flex-1 flex flex-col justify-center mb-8">
  <div
@@ -2681,8 +3178,8 @@
  </div>
  <p class="text-[8px] font-mono text-neo-green/50 uppercase tracking-[0.2em] mb-1">
  Matrix_Output</p>
- <img src="https://ghchart.rshah.org/33FF57/YuvisTechPoint" alt="GitHub Contribution Graph"
- class="w-full h-auto filter brightness-110" style="image-rendering: auto;" />
+ <img data-consent-src="https://ghchart.rshah.org/33FF57/YuvisTechPoint" alt="GitHub Contribution Graph"
+ class="w-full h-auto filter brightness-110 min-h-[120px] bg-neo-black/40" style="image-rendering: auto;" width="800" height="120" loading="lazy" decoding="async" />
  </div>
  </div>
 
@@ -2726,8 +3223,8 @@
  </div>
  </div>
  <div class="text-right">
- <div class="text-2xl font-black text-neo-orange tracking-tighter">#Top</div>
- <p class="text-[8px] font-mono text-gray-500 uppercase">Ranking</p>
+ <div id="lc-ranking" class="text-2xl font-black text-neo-orange tracking-tighter">—</div>
+ <p class="text-[8px] font-mono text-gray-500 uppercase">Badges</p>
  </div>
  </div>
 
@@ -2799,8 +3296,8 @@
  <div
  class="absolute top-1 right-1 w-1.5 h-1.5 bg-neo-orange rounded-full animate-pulse">
  </div>
- <img src="https://leetcard.jacoblin.cool/YuvisTechPoint?theme=dark&font=Ubuntu&ext=heatmap"
- alt="LeetCode Stats" class="w-full h-auto object-contain filter contrast-125" />
+ <img data-consent-src="https://leetcard.jacoblin.cool/YuvisTechPoint?theme=dark&font=Ubuntu&ext=heatmap"
+ alt="LeetCode Stats" class="w-full h-auto object-contain filter contrast-125 min-h-[120px] bg-neo-black/40" width="800" height="200" loading="lazy" decoding="async" />
  </div>
  </div>
 
@@ -3047,8 +3544,8 @@
  </div>
  <div class="w-full border-4 border-black shadow-hard overflow-hidden mt-2">
  <iframe
- src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d22936.71375619577!2d88.46748938804473!3d22.697075658540758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f89f5b7581e653%3A0x6eabb6ab2c960f05!2sVivekananda%20Nagar%2C%20Surja%20Sen%20Nagar%2C%20Madhyamgram%2C%20West%20Bengal!5e0!3m2!1sen!2sin!4v1780167796248!5m2!1sen!2sin"
- class="w-full h-56 md:h-64" style="border:0;" allowfullscreen="" loading="lazy"
+ data-consent-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d22936.71375619577!2d88.46748938804473!3d22.697075658540758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f89f5b7581e653%3A0x6eabb6ab2c960f05!2sVivekananda%20Nagar%2C%20Surja%20Sen%20Nagar%2C%20Madhyamgram%2C%20West%20Bengal!5e0!3m2!1sen!2sin!4v1780167796248!5m2!1sen!2sin"
+ class="w-full h-56 md:h-64 bg-neo-black" style="border:0;" allowfullscreen="" loading="lazy"
  referrerpolicy="no-referrer-when-downgrade" title="Vivekananda Nagar, Madhyamgram, Kolkata"></iframe>
  </div>
  <div class="contact-socials pt-4">
@@ -3066,25 +3563,29 @@
  </div>
  </div>
 
- <form id="contact-form" class="space-y-6 bg-gray-50 p-6 border-2 border-black" novalidate>
+ <form id="contact-form" class="space-y-6 bg-gray-50 p-6 border-2 border-black relative" novalidate>
+ <div class="absolute opacity-0 pointer-events-none h-0 overflow-hidden" aria-hidden="true">
+ <label for="contact-company">Company website</label>
+ <input type="text" id="contact-company" name="company" tabindex="-1" autocomplete="off">
+ </div>
  <div class="flex flex-col">
  <label for="contact-name" class="font-mono font-bold mb-1 uppercase text-xs">Identity</label>
- <input type="text" id="contact-name" name="name" required placeholder="NAME / COMPANY" autocomplete="name"
+ <input type="text" id="contact-name" name="name" required placeholder="NAME / COMPANY" autocomplete="name" maxlength="100"
  class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
  </div>
  <div class="flex flex-col">
  <label for="contact-email" class="font-mono font-bold mb-1 uppercase text-xs">Coordinates</label>
- <input type="email" id="contact-email" name="email" required placeholder="EMAIL ADDRESS" autocomplete="email"
+ <input type="email" id="contact-email" name="email" required placeholder="EMAIL ADDRESS" autocomplete="email" maxlength="254"
  class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
  </div>
  <div class="flex flex-col">
  <label for="contact-subject" class="font-mono font-bold mb-1 uppercase text-xs">Subject</label>
- <input type="text" id="contact-subject" name="subject" placeholder="FREELANCE / JOB / COLLAB"
+ <input type="text" id="contact-subject" name="subject" placeholder="FREELANCE / JOB / COLLAB" maxlength="120"
  class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
  </div>
  <div class="flex flex-col">
  <label for="contact-message" class="font-mono font-bold mb-1 uppercase text-xs">Transmission</label>
- <textarea id="contact-message" name="message" rows="4" required placeholder="PROJECT DETAILS..."
+ <textarea id="contact-message" name="message" rows="4" required placeholder="PROJECT DETAILS..." maxlength="5000"
  class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all resize-none cursor-hover"></textarea>
  </div>
  <p id="form-status" class="font-mono text-sm font-bold hidden" role="status" aria-live="polite"></p>
@@ -3098,7 +3599,12 @@
  class="w-full text-center bg-white text-black font-black text-lg py-3 border-2 border-black shadow-hard hover:bg-neo-green hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
  <i class="ri-mail-send-line"></i> SEND EMAIL DIRECTLY
  </a>
+ <a href="https://www.linkedin.com/in/yuvrajprasad/" target="_blank" rel="noopener noreferrer" data-track="book_call"
+ class="w-full text-center bg-neo-black text-white font-black text-lg py-3 border-2 border-black shadow-hard hover:bg-neo-blue hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
+ <i class="ri-calendar-check-line"></i> BOOK A CALL (LINKEDIN)
+ </a>
  </div>
+ <p class="font-mono text-[10px] text-gray-500 uppercase">Messages are processed per our <a href="privacy.html" class="text-neo-blue underline hover:text-black">privacy policy</a>.</p>
  </form>
  </div>
  </div>
@@ -3115,7 +3621,7 @@
  <span class="font-bold text-neo-green text-sm uppercase tracking-widest">SYSTEM_ONLINE</span>
  </div>
  <p class="text-gray-400 text-xs sm:text-sm">
- <span class="text-white/50">$</span> status --all &nbsp;|&nbsp; Kolkata, IN &nbsp;|&nbsp; Open for work
+ <span class="text-white/50">$</span> status --all &nbsp;|&nbsp; Kolkata, IN &nbsp;|&nbsp; <span id="kolkata-clock" class="text-neo-yellow">--:-- IST</span> &nbsp;|&nbsp; Open for work
  </p>
  <a href="#contact"
  class="nav-hire-btn hire-me-cta inline-flex items-center justify-center font-mono font-black text-sm px-4 py-2 border-2 border-black shadow-hard-sm hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all cursor-hover"
@@ -3174,6 +3680,18 @@
  class="group hover:text-neo-yellow transition-colors cursor-hover">
  <span class="sitemap-icon" aria-hidden="true"><i class="ri-trophy-line"></i></span>
  <span>Wins</span></a></li>
+ <li><a href="#education"
+ class="group hover:text-neo-yellow transition-colors cursor-hover">
+ <span class="sitemap-icon" aria-hidden="true"><i class="ri-graduation-cap-line"></i></span>
+ <span>Education</span></a></li>
+ <li><a href="#coding-stats"
+ class="group hover:text-neo-yellow transition-colors cursor-hover">
+ <span class="sitemap-icon" aria-hidden="true"><i class="ri-bar-chart-line"></i></span>
+ <span>Coding Stats</span></a></li>
+ <li><a href="#achievements"
+ class="group hover:text-neo-yellow transition-colors cursor-hover">
+ <span class="sitemap-icon" aria-hidden="true"><i class="ri-medal-line"></i></span>
+ <span>Achievements</span></a></li>
  <li><a href="#intellectual-property"
  class="group hover:text-neo-yellow transition-colors cursor-hover">
  <span class="sitemap-icon" aria-hidden="true"><i class="ri-award-line"></i></span>
@@ -3236,8 +3754,12 @@
 
  <div class="footer-bottom">
  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-gray-500 text-sm">
- <p><span class="copyright-mark" aria-hidden="true">&copy;</span> 2026 YUVRAJ.exe // SYSTEM_END</p>
+ <p><span class="copyright-mark" aria-hidden="true">&copy;</span> 2026 YUVRAJ.exe // SYSTEM_END · <span id="site-build" class="text-gray-600"></span></p>
  <div class="flex flex-wrap items-center gap-4">
+ <a href="privacy.html"
+ class="text-xs font-mono font-bold text-gray-500 hover:text-neo-green transition-colors cursor-hover uppercase">
+ PRIVACY
+ </a>
  <button type="button" id="cookie-settings-btn"
  class="text-xs font-mono font-bold text-gray-500 hover:text-neo-green transition-colors cursor-hover uppercase">
  COOKIE_SETTINGS
@@ -3260,6 +3782,7 @@
 
  <script src="Assets/js/projects-data.js" defer></script>
  <script src="Assets/js/main.js" defer></script>
+ <script src="Assets/js/premium.js" defer></script>
 </body>
 
 </html>
