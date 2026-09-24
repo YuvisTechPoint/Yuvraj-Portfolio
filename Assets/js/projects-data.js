@@ -7,6 +7,25 @@
 
     const PROJECTS = [
         {
+            title: 'Edquate',
+            role: 'AI Product Engineer @ Orcrys',
+            highlights: [
+                'AI-powered learning OS with visual whiteboard, adaptive roadmaps, and code lab.',
+                'Integrating LLMs and Generative AI for personalized tutoring, practice, and diagnostics.',
+                'Production-ready features for learners and campuses — edquate.com.'
+            ],
+            desc: 'AI-powered learning OS — personal tutor with visual whiteboard, adaptive roadmaps, assessments, code lab, and career intelligence. Built at Orcrys as a flagship EdTech platform for learners and campuses.',
+            tags: ['AI Tutor', 'EdTech', 'LLMs', 'Gen AI', 'Next.js'],
+            dataTags: 'web ai',
+            stagger: false,
+            hoverClass: 'group-hover:text-neo-orange',
+            live: 'https://edquate.com',
+            preview: 'screenshot',
+            previewUrl: 'https://edquate.com',
+            previewImage: 'Assets/images/previews/edquate.webp',
+            label: 'edquate.com'
+        },
+        {
             title: 'Oracle Community',
             role: 'Site Lead & Full Stack Developer',
             highlights: [
@@ -25,25 +44,6 @@
             previewUrl: 'https://oraclekol.vercel.app/',
             previewImage: 'Assets/images/previews/oracle-community.webp',
             label: 'Oracle Kolkata Community'
-        },
-        {
-            title: 'Edquate',
-            role: 'Product Engineer',
-            highlights: [
-                'AI-powered learning OS with visual whiteboard, adaptive roadmaps, and code lab.',
-                'Combines tutor, practice, assessments, and career intelligence in one platform.',
-                'Built for learners and campuses with LLM-driven personalization.'
-            ],
-            desc: 'AI-powered learning OS - personal tutor with visual whiteboard, adaptive roadmaps, assessments, code lab, and career intelligence. Tutor, practice, and diagnostics in one platform for learners and campuses.',
-            tags: ['AI Tutor', 'EdTech', 'Roadmaps', 'Code Lab', 'LLMs'],
-            dataTags: 'web ai',
-            stagger: true,
-            hoverClass: 'group-hover:text-neo-orange',
-            live: 'https://edquate.com',
-            preview: 'screenshot',
-            previewUrl: 'https://edquate.com',
-            previewImage: 'Assets/images/previews/edquate.webp',
-            label: 'Edquate.com Preview'
         },
         {
             title: 'EscrowX',
@@ -81,18 +81,18 @@
             label: 'Orcrys.com Preview'
         },
         {
-            title: 'Vive Music',
+            title: 'Vibe Music',
             desc: 'Full-stack music instruments e-commerce platform built with Django - user auth, shopping cart, Razorpay payments, and AI image-based product search that classifies instruments and surfaces matching catalog items.',
             tags: ['Django', 'Python', 'Razorpay', 'AI Search', 'E-commerce'],
             dataTags: 'web ai',
             stagger: false,
             hoverClass: 'group-hover:text-neo-yellow',
-            live: 'https://vibemusic-official.vercel.app/',
+            live: 'https://vibemusic.in/',
             github: 'https://github.com/YuvisTechPoint/Vive-Music',
             preview: 'screenshot',
-            previewUrl: 'https://vibemusic-official.vercel.app/',
-            previewImage: 'Assets/images/previews/vive-music.webp',
-            label: 'vibemusic-official.vercel.app'
+            previewUrl: 'https://vibemusic.in/',
+            previewImage: 'Assets/images/previews/vibe-music.webp',
+            label: 'vibemusic.in'
         },
         {
             title: 'Mohasti',
@@ -147,18 +147,18 @@
             label: 'beetlex.vercel.app'
         },
         {
-            title: 'Qualytics',
-            desc: 'Production-grade marketing site for an AI-augmented data quality platform — Next.js with Three.js hero visuals, D3 dashboards, Framer Motion scroll reveals, Prisma-backed demo and trial forms, and Sanity CMS content architecture.',
-            tags: ['Next.js', 'Three.js', 'D3.js', 'Prisma', 'Data Quality'],
+            title: 'Glyphatic',
+            desc: 'AI-native enterprise transformation & operations platform — modernize, automate, and operate at scale across India and APAC. Products, solutions, and intelligence spanning AI transformation, automation, and hybrid operations.',
+            tags: ['AI Transformation', 'Enterprise', 'Automation', 'Operations', 'Next.js'],
             dataTags: 'web ai',
             stagger: false,
             hoverClass: 'group-hover:text-neo-blue',
-            github: 'https://github.com/YuvisTechPoint/Qualytics',
+            live: 'https://glyphatic.com/',
+            github: 'https://github.com/YuvisTechPoint/Glyphatic',
             preview: 'screenshot',
-            previewUrl: 'https://github.com/YuvisTechPoint/Qualytics',
-            previewImage: 'Assets/images/previews/qualytics.webp',
-            label: 'github.com/YuvisTechPoint/Qualytics',
-            previewBadge: 'Open Source',
+            previewUrl: 'https://glyphatic.com/',
+            previewImage: 'Assets/images/previews/glyphatic.webp',
+            label: 'glyphatic.com'
         },
         {
             title: 'Jurisbloom Associates',

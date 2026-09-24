@@ -1,48 +1,79 @@
+import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
-import { pathToFileURL } from 'url';
 import path from 'path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const fileUrl = pathToFileURL(path.join(ROOT, 'index.html')).href;
+const PORT = 8765;
+const BASE = `http://127.0.0.1:${PORT}`;
 
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-await page.goto(fileUrl, { waitUntil: 'networkidle', timeout: 60000 });
+function startServer() {
+    return new Promise((resolve, reject) => {
+        const proc = spawn('npx', ['--yes', 'serve', '.', '-p', String(PORT)], {
+            cwd: ROOT,
+            shell: true,
+            stdio: 'ignore',
+        });
+        proc.on('error', reject);
+        setTimeout(() => resolve(proc), 2500);
+    });
+}
 
-const previewSrc = await page.evaluate(() => {
-    const CV_PDF_PATH = 'Assets/Resume/Yuvraj%20Prasad%20CV.pdf';
-    const pdfUrl = new URL(CV_PDF_PATH, window.location.href).href;
-    return {
-        protocol: window.location.protocol,
-        pdfUrl,
-        previewSrc: window.location.protocol === 'file:' ? pdfUrl : (() => {
-            const viewer = new URL('Assets/cv-viewer.html', window.location.href);
-            viewer.searchParams.set('src', pdfUrl);
-            return viewer.href;
-        })(),
-    };
-});
+const server = await startServer();
 
-await page.click('#hero-preview-cv');
-await page.waitForTimeout(1500);
+try {
+    const browser = await chromium.launch();
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await page.goto(`${BASE}/`, { waitUntil: 'networkidle', timeout: 60000 });
 
-const modalState = await page.evaluate(() => {
-    const frame = document.getElementById('cv-modal-frame');
-    return {
-        modalOpen: document.getElementById('cv-modal')?.classList.contains('open'),
-        frameSrc: frame?.src || '',
-        loadingHidden: document.getElementById('cv-modal-loading')?.classList.contains('hidden'),
-    };
-});
+    const previewSrc = await page.evaluate(() => ({
+        pdfUrl: window.YP_CV_CONFIG?.getPdfUrl?.() || '',
+        previewSrc: window.YP_CV_CONFIG?.getViewerUrl?.() || '',
+    }));
 
-const ok =
-    previewSrc.protocol === 'file:' &&
-    previewSrc.previewSrc.includes('Yuvraj') &&
-    !previewSrc.previewSrc.includes('yuvrajprasad.vercel.app') &&
-    modalState.modalOpen &&
-    modalState.frameSrc.includes('Yuvraj') &&
-    !modalState.frameSrc.includes('yuvrajprasad.vercel.app');
+    await page.click('#hero-preview-cv');
+    await page.waitForTimeout(8000);
 
-console.log(JSON.stringify({ previewSrc, modalState, ok }, null, 2));
-await browser.close();
-process.exit(ok ? 0 : 1);
+    const modalState = await page.evaluate(() => {
+        const frame = document.getElementById('cv-modal-frame');
+        return {
+            modalOpen: document.getElementById('cv-modal')?.classList.contains('open'),
+            frameSrc: frame?.src || '',
+            loadingHidden: document.getElementById('cv-modal-loading')?.classList.contains('hidden'),
+        };
+    });
+
+    let frameRendered = false;
+    if (modalState.frameSrc.includes('cv-viewer.html')) {
+        const frame = page.frameLocator('#cv-modal-frame');
+        frameRendered = await frame.locator('#canvas').evaluate((canvas) => {
+            if (!canvas || canvas.hidden || canvas.width < 10 || canvas.height < 10) return false;
+            const ctx = canvas.getContext('2d');
+            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            for (let i = 0; i < data.length; i += 16) {
+                if (data[i] < 250 || data[i + 1] < 250 || data[i + 2] < 250) return true;
+            }
+            return false;
+        }).catch(() => false);
+
+        if (!frameRendered) {
+            frameRendered = await frame.locator('#pdf-object, #pdf-embed').evaluate((node) => {
+                if (!node || node.hidden) return false;
+                const src = node.getAttribute('data') || node.getAttribute('src') || '';
+                return src.toLowerCase().includes('.pdf');
+            }).catch(() => false);
+        }
+    }
+
+    const ok =
+        previewSrc.previewSrc.includes('cv-viewer.html') &&
+        previewSrc.previewSrc.includes('Yuvraj') &&
+        modalState.modalOpen &&
+        modalState.frameSrc.includes('cv-viewer.html') &&
+        frameRendered;
+
+    console.log(JSON.stringify({ previewSrc, modalState, frameRendered, ok }, null, 2));
+    await browser.close();
+    process.exit(ok ? 0 : 1);
+} finally {
+    server.kill('SIGTERM');
+}

@@ -137,7 +137,7 @@ Projects are rendered from `Assets/js/projects-data.js` and support **tag filter
 - **LeetCode integration** — badges, heatmap (LeetCard), history marquee
 - **Project & achievement filters** — client-side tag/year/tier filtering
 - **Lazy project previews** — static WebP screenshots for all projects; Microlink fallback when needed
-- **Contact form** — POST to `/api/contact` (Resend on Vercel) with mailto fallback when API is unavailable
+- **Contact form** — POST to `/api/contact` (Resend or Gmail SMTP on Vercel), with Web3Forms browser relay as fallback
 - **Copy to clipboard** — email and phone one-click copy
 - **Mobile hamburger menu** + skip-to-content link
 
@@ -202,14 +202,18 @@ npm run optimize:images  # compress images via sharp
 npm run generate:og      # create og-banner.jpg for social previews
 npm run verify:assets    # check required deploy assets exist
 npm run predeploy        # build CSS + verify assets
+npm run dev              # local static server on :8080
+npm test                 # asset checks + API + Playwright smoke tests
 ```
 
 ### Deploy to Vercel (production)
 
 1. Connect the repo to [Vercel](https://vercel.com).
 2. Set environment variables in the project dashboard:
-   - `RESEND_API_KEY` — required for contact form email delivery
-   - `CONTACT_FROM` — optional verified sender (defaults to Resend onboarding address)
+   - `RESEND_API_KEY` + `CONTACT_FROM` — recommended contact delivery (Resend)
+   - `GMAIL_USER` + `GMAIL_APP_PASSWORD` — alternative SMTP delivery to `prasadyuvraj8805@gmail.com`
+   - `WEB3FORMS_ACCESS_KEY` — browser relay fallback (get free key at [web3forms.com](https://web3forms.com))
+   - **Vercel KV** or **Upstash Redis** — live unique visitor count in the footer (`VISITOR_BASELINE` optional)
 3. Deploy. CI runs `build:css` and `verify:assets` on push to `main`.
 4. Canonical URL: [https://yuvrajprasad.vercel.app/](https://yuvrajprasad.vercel.app/)
 

@@ -7,7 +7,7 @@
 
  <!-- SEO Meta Tags -->
  <meta name="description"
- content="Yuvraj Prasad — AI Product Engineer @ Mewayz and Full Stack Developer from Kolkata. 10+ hackathon wins, patent holder, MERN, AI/ML, and Web3.">
+ content="Yuvraj Prasad — AI Product Engineer @ Orcrys (Edquate) and Full Stack Developer from Kolkata. 10+ hackathon wins, patent holder, MERN, AI/ML, and Web3.">
  <meta name="keywords"
  content="Yuvraj Prasad, Full Stack Developer, MERN, Java, Python, AI/ML, Web3, NeoBrutalist, Portfolio">
  <meta name="author" content="Yuvraj Prasad">
@@ -19,7 +19,7 @@
  <meta property="og:url" content="https://yuvrajprasad.vercel.app/">
  <meta property="og:title" content="YUVRAJ PRASAD | AI Product Engineer & Full Stack Developer">
  <meta property="og:description"
- content="AI Product Engineer @ Mewayz · Full Stack Developer · 10+ hackathon wins · Patent holder · Kolkata, India">
+ content="AI Product Engineer @ Orcrys (Edquate) · Full Stack Developer · 10+ hackathon wins · Patent holder · Kolkata, India">
  <meta property="og:image" content="https://yuvrajprasad.vercel.app/Assets/images/og-banner.jpg">
  <meta property="og:image:width" content="1200">
  <meta property="og:image:height" content="630">
@@ -30,7 +30,7 @@
  <meta property="twitter:url" content="https://yuvrajprasad.vercel.app/">
  <meta property="twitter:title" content="YUVRAJ PRASAD | AI Product Engineer & Full Stack Developer">
  <meta property="twitter:description"
- content="AI Product Engineer @ Mewayz · Full Stack Developer · 10+ hackathon wins · Patent holder · Kolkata, India">
+ content="AI Product Engineer @ Orcrys (Edquate) · Full Stack Developer · 10+ hackathon wins · Patent holder · Kolkata, India">
  <meta property="twitter:image" content="https://yuvrajprasad.vercel.app/Assets/images/og-banner.jpg">
 
  <title>YUVRAJ PRASAD | AI Product Engineer & Full Stack Developer</title>
@@ -40,7 +40,7 @@
 
  <!-- Theme & Performance -->
  <meta name="theme-color" content="#121212">
- <meta name="site-version" content="2026.06.1">
+ <meta name="site-version" content="2026.09.1">
  <meta name="apple-mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-title" content="Yuvraj Prasad">
  <meta name="format-detection" content="telephone=no">
@@ -78,7 +78,7 @@
  "https://www.instagram.com/yuvistechpoint.yt/",
  "https://youtube.com/@yuvistechpoint/"
  ],
- "description": "AI Product Engineer at Mewayz and Full Stack Developer from Kolkata. MERN, Java, Python, AI/ML, Web3. Co-founder, patent holder, and hackathon winner."
+ "description": "AI Product Engineer at Orcrys (Edquate) and Full Stack Developer from Kolkata. MERN, Java, Python, AI/ML, Web3. Co-founder, patent holder, and hackathon winner."
  }
  </script>
  <script type="application/ld+json">
@@ -1436,6 +1436,22 @@
  padding: 0.75rem;
  }
 
+ #book-form-status.form-status--success,
+ #book-pay-status.form-status--success {
+ color: #121212;
+ background: #33FF57;
+ border: 2px solid #121212;
+ padding: 0.75rem;
+ }
+
+ #book-form-status.form-status--error,
+ #book-pay-status.form-status--error {
+ color: #fff;
+ background: #FF2A2A;
+ border: 2px solid #121212;
+ padding: 0.75rem;
+ }
+
  .cookie-consent-grid {
  display: grid;
  grid-template-columns: 1fr 1fr;
@@ -1922,6 +1938,71 @@
  overflow: hidden;
  }
 
+ #book-call-modal {
+ position: fixed;
+ inset: 0;
+ z-index: 9997;
+ display: none;
+ align-items: center;
+ justify-content: center;
+ padding: 1rem;
+ background: rgba(18, 18, 18, 0.85);
+ }
+
+ #book-call-modal.open { display: flex; }
+
+ #book-call-panel {
+ width: min(28rem, 96vw);
+ max-height: min(90vh, 880px);
+ border: 4px solid #121212;
+ box-shadow: 12px 12px 0 #121212;
+ background: #fff;
+ display: flex;
+ flex-direction: column;
+ overflow: hidden;
+ }
+
+ #book-call-body {
+ flex: 1 1 auto;
+ min-height: 0;
+ overflow-y: auto;
+ padding: 1.25rem;
+ }
+
+ #book-call-qr {
+ width: 240px;
+ height: 240px;
+ margin: 0 auto;
+ border: 4px solid #121212;
+ background: #fff;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ overflow: hidden;
+ }
+
+ #book-call-qr img,
+ #book-call-qr canvas {
+ width: 240px !important;
+ height: 240px !important;
+ display: block;
+ }
+
+ .book-call-step[hidden] { display: none !important; }
+
+ @media (max-width: 767px) {
+ #book-call-modal {
+ align-items: flex-end;
+ padding: 0.5rem 0.5rem calc(3.25rem + env(safe-area-inset-bottom, 0px));
+ }
+
+ #book-call-panel {
+ width: 100%;
+ max-height: min(88dvh, calc(100dvh - 4rem));
+ box-shadow: 8px 8px 0 #121212;
+ }
+ }
+
  #project-modal-body {
  flex: 1 1 auto;
  min-height: 0;
@@ -2312,7 +2393,7 @@
 
  @media print {
  #cursor, #page-loader, #cookie-consent, #command-palette, #shortcuts-modal,
- #cv-modal, #project-modal, #sticky-hire-bar, #section-rail, #back-to-top,
+ #cv-modal, #project-modal, #book-call-modal, #sticky-hire-bar, #section-rail, #back-to-top,
  #progressBar, #site-toast, nav, .marquee-container, .hero-ticker {
  display: none !important;
  }
@@ -2436,6 +2517,118 @@
  </div>
  </div>
 
+ <div id="book-call-modal" role="dialog" aria-modal="true" aria-labelledby="book-call-modal-title" hidden>
+ <div id="book-call-panel">
+ <div class="flex items-center justify-between gap-2 p-3 border-b-4 border-black bg-neo-green font-mono font-bold text-sm">
+ <span id="book-call-modal-title">BOOK_CALL · ₹10 / 30 MIN</span>
+ <button type="button" id="book-call-close" class="px-3 py-1 bg-neo-red text-white border-2 border-black" aria-label="Close booking">CLOSE</button>
+ </div>
+ <div id="book-call-body">
+ <div id="book-call-step-form" class="book-call-step space-y-4">
+ <p class="font-mono text-xs text-gray-600 uppercase leading-relaxed">
+ 30-minute strategy / mentoring session · ₹10 INR via UPI · fill details, then scan QR to pay.
+ </p>
+ <form id="book-call-form" class="space-y-3" novalidate>
+ <div class="flex flex-col">
+ <label for="book-name" class="font-mono font-bold mb-1 uppercase text-xs">Identity</label>
+ <input type="text" id="book-name" name="name" required maxlength="100" placeholder="FULL NAME" autocomplete="name"
+ class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
+ </div>
+ <div class="flex flex-col">
+ <label for="book-email" class="font-mono font-bold mb-1 uppercase text-xs">Email</label>
+ <input type="email" id="book-email" name="email" required maxlength="254" placeholder="EMAIL ADDRESS" autocomplete="email"
+ class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
+ </div>
+ <div class="flex flex-col">
+ <label for="book-phone" class="font-mono font-bold mb-1 uppercase text-xs">Phone (WhatsApp)</label>
+ <input type="tel" id="book-phone" name="phone" required maxlength="20" placeholder="+91 XXXXX XXXXX" autocomplete="tel"
+ class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
+ </div>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ <div class="flex flex-col">
+ <label for="book-date" class="font-mono font-bold mb-1 uppercase text-xs">Preferred date</label>
+ <input type="date" id="book-date" name="date" required
+ class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
+ </div>
+ <div class="flex flex-col">
+ <label for="book-time" class="font-mono font-bold mb-1 uppercase text-xs">Preferred time (IST)</label>
+ <input type="time" id="book-time" name="time" required
+ class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all cursor-hover">
+ </div>
+ </div>
+ <div class="flex flex-col">
+ <label for="book-topic" class="font-mono font-bold mb-1 uppercase text-xs">Session topic</label>
+ <textarea id="book-topic" name="topic" rows="3" required maxlength="500" placeholder="What do you want to discuss?"
+ class="bg-white border-2 border-black p-3 font-bold focus:outline-none focus:bg-neo-yellow focus:shadow-hard-sm transition-all resize-none cursor-hover"></textarea>
+ </div>
+ <p id="book-form-status" class="font-mono text-sm font-bold hidden" role="status" aria-live="polite"></p>
+ <button type="submit" id="book-continue-btn"
+ class="w-full bg-neo-blue text-white font-black text-lg py-3 border-2 border-black shadow-hard neo-button hover:bg-neo-black hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
+ CONTINUE TO PAYMENT →
+ </button>
+ </form>
+ </div>
+
+ <div id="book-call-step-pay" class="book-call-step space-y-4" hidden>
+ <div class="border-2 border-black bg-neo-yellow/40 p-3 font-mono text-xs space-y-1">
+ <p><span class="font-bold">SESSION:</span> 30 minutes</p>
+ <p><span class="font-bold">AMOUNT:</span> ₹10.00 INR</p>
+ <p><span class="font-bold">REF:</span> <span id="book-ref-label">—</span></p>
+ <p class="text-gray-700" id="book-pay-summary"></p>
+ </div>
+ <p class="font-mono text-xs text-center uppercase font-bold">Scan QR with any UPI app to pay</p>
+ <div id="book-call-qr" class="mx-auto" role="img" aria-label="UPI payment QR code"></div>
+ <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between border-2 border-black p-2 bg-gray-50">
+ <code id="book-upi-id" class="font-mono text-xs sm:text-sm font-bold break-all px-1">prasadyuvraj8805-5@okicici</code>
+ <button type="button" id="book-copy-upi"
+ class="shrink-0 font-mono text-xs font-bold bg-neo-black text-white px-3 py-2 border-2 border-black shadow-hard-sm hover:bg-neo-yellow hover:text-black transition-all cursor-hover">
+ COPY UPI
+ </button>
+ </div>
+ <div class="flex flex-col gap-2">
+ <a id="book-open-upi" href="#"
+ class="w-full text-center bg-neo-blue text-white font-black text-lg py-3 border-2 border-black shadow-hard hover:bg-neo-black hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
+ <i class="ri-smartphone-line"></i> OPEN UPI PAYMENT
+ </a>
+ <div id="book-awaiting" class="border-2 border-black bg-neo-green/30 p-3 font-mono text-xs space-y-2" hidden>
+ <p class="font-black uppercase flex items-center gap-2">
+ <i class="ri-loader-4-line animate-spin text-base" aria-hidden="true"></i>
+ Waiting for payment…
+ </p>
+ <p class="text-gray-700 leading-relaxed" id="book-awaiting-copy">
+ Complete ₹10 in your UPI app. This booking auto-confirms when you return here after paying.
+ </p>
+ </div>
+ <button type="button" id="book-confirm-paid"
+ class="w-full bg-white text-black font-bold text-sm py-2 border-2 border-black hover:bg-neo-yellow transition-all cursor-hover">
+ Already paid? Confirm now
+ </button>
+ <button type="button" id="book-back-form"
+ class="w-full bg-white text-black font-bold text-sm py-2 border-2 border-black hover:bg-neo-yellow transition-all cursor-hover">
+ ← EDIT DETAILS
+ </button>
+ </div>
+ <p id="book-pay-status" class="font-mono text-sm font-bold hidden" role="status" aria-live="polite"></p>
+ </div>
+
+ <div id="book-call-step-done" class="book-call-step space-y-4 text-center" hidden>
+ <div class="w-16 h-16 mx-auto bg-neo-green border-4 border-black flex items-center justify-center text-3xl shadow-hard">
+ <i class="ri-checkbox-circle-fill"></i>
+ </div>
+ <h3 class="font-black text-2xl uppercase">Booking received</h3>
+ <p class="font-mono text-sm text-gray-700 leading-relaxed" id="book-done-message">
+ Thanks! A confirmation email with your booking report and calendar invite was sent. A host copy was also delivered for scheduling.
+ </p>
+ <p class="font-mono text-xs font-bold">REF: <span id="book-done-ref">—</span></p>
+ <button type="button" id="book-done-close"
+ class="w-full bg-neo-black text-white font-black text-lg py-3 border-2 border-black shadow-hard hover:bg-neo-green hover:text-black hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
+ DONE
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+
  <div id="shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title" hidden>
  <div id="shortcuts-modal-panel">
  <div class="flex items-center justify-between gap-2 mb-2">
@@ -2457,7 +2650,7 @@
  <div class="flex items-center justify-between gap-2 p-3 border-b-4 border-black bg-neo-yellow font-mono font-bold text-sm">
  <span>RESUME_PREVIEW.pdf</span>
  <div class="flex gap-2">
- <a href="Assets/Resume/Yuvraj%20Prasad%20CV.pdf" download data-track="cv_download"
+ <a href="Assets/Resume/Yuvraj%20Prasad%20CV.pdf" download data-cv-download data-track="cv_download"
  class="px-3 py-1 bg-neo-black text-white border-2 border-black hover:bg-neo-green hover:text-black transition-colors">DOWNLOAD</a>
  <button type="button" id="cv-modal-close" class="px-3 py-1 bg-neo-red text-white border-2 border-black">CLOSE</button>
  </div>
@@ -2629,9 +2822,9 @@
  <span class="text-lg sm:text-xl md:text-2xl font-black uppercase leading-tight">AI Product Engineer</span>
  <span class="role-date-badge font-mono text-[10px] sm:text-xs font-bold bg-neo-black text-white px-2 py-1">MAY 2026 – PRESENT</span>
  </div>
- <p class="font-mono text-xs sm:text-sm md:text-base text-neo-purple font-bold mb-2 leading-snug">@ Mewayz Global Corporation | Full-time | Onsite, Kolkata</p>
- <p class="about-role-desc--full font-mono text-sm md:text-base text-gray-800 leading-relaxed">Leading the AI Product Unit, building AI-powered products, agentic frameworks, and scalable architectures across the Mewayz ecosystem. Driving product design, system design, AI model orchestration and classification, solution architecture, and rapid deployment while mentoring engineering teams and delivering innovative solutions aligned with business growth and platform evolution.</p>
- <p class="about-role-desc--mobile font-mono text-sm text-gray-800 leading-relaxed">Leading the AI Product Unit at Mewayz — building agentic frameworks, AI orchestration, and scalable product architecture in Kolkata.</p>
+ <p class="font-mono text-xs sm:text-sm md:text-base text-neo-purple font-bold mb-2 leading-snug">@ Orcrys Technologies Pvt. Ltd. | Full-time | Hybrid</p>
+ <p class="about-role-desc--full font-mono text-sm md:text-base text-gray-800 leading-relaxed">AI Product Engineer at Orcrys Technologies, contributing to Edquate — an AI-powered learning platform. Designing scalable AI solutions, integrating LLMs and Generative AI capabilities, and delivering production-ready features while collaborating with cross-functional teams to drive innovation, performance, and business growth.</p>
+ <p class="about-role-desc--mobile font-mono text-sm text-gray-800 leading-relaxed">AI Product Engineer @ Orcrys — building Edquate with scalable LLM integrations and production-ready AI features.</p>
  </div>
  <p class="about-bio font-mono text-base sm:text-xl leading-relaxed mb-6">
  I am Yuvraj Prasad - a versatile software developer, co-founder, and community builder from Kolkata.
@@ -2642,11 +2835,11 @@
  </p>
  <p class="about-highlights font-mono text-sm sm:text-base md:text-lg mb-6 md:mb-8 text-gray-600 border-l-4 border-neo-purple pl-4">
  > Specialized in MERN Stack, AI/ML, Web3, and System Design.<br>
- > Full Stack Developer @ Orcrys Technologies | AI Product Engineer @ Mewayz Global Corporation.<br>
+ > AI Product Engineer @ Orcrys Technologies (Edquate) | Ex Technical Lead @ Mewayz Global Corporation.<br>
  > Patent Holder - Government of India Patent Office (2025).<br>
  > 10+ Hackathon Wins across India's top competitions.<br>
  > Languages: English, Hindi, Bengali.<br>
- > Currently in 4th Year B.Tech CSE @ Techno India College of Technology.
+ > Completed B.Tech CSE @ Techno India College of Technology.
  </p>
 
  <div id="about-badges" class="flex flex-wrap gap-2">
@@ -2682,75 +2875,36 @@
 
  <div id="skill-filters" class="flex flex-wrap gap-2 font-mono text-xs font-bold" role="group" aria-label="Filter skills">
  <button type="button" data-skill-filter="all" class="skill-filter active border-2 border-black shadow-hard-sm">ALL</button>
+ <button type="button" data-skill-filter="ai" class="skill-filter border-2 border-black shadow-hard-sm hover:bg-neo-purple">AI/ML</button>
  <button type="button" data-skill-filter="frontend" class="skill-filter border-2 border-black shadow-hard-sm hover:bg-neo-yellow">FRONTEND</button>
  <button type="button" data-skill-filter="backend" class="skill-filter border-2 border-black shadow-hard-sm hover:bg-neo-blue">BACKEND</button>
- <button type="button" data-skill-filter="ai" class="skill-filter border-2 border-black shadow-hard-sm hover:bg-neo-purple">AI/ML</button>
- <button type="button" data-skill-filter="web3" class="skill-filter border-2 border-black shadow-hard-sm hover:bg-neo-orange">WEB3</button>
- <button type="button" data-skill-filter="devops" class="skill-filter border-2 border-black shadow-hard-sm hover:bg-neo-pink">DEVOPS</button>
+ <button type="button" data-skill-filter="systems" class="skill-filter border-2 border-black shadow-hard-sm hover:bg-neo-orange">SYSTEMS</button>
  </div>
 
  <div id="skills-grid" class="skills-grid w-full">
 
- <div data-category="frontend"
+ <div data-category="ai"
  class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-white transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ LIBRARY
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">React.js
- </div>
- </div>
-
- <div data-category="frontend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-yellow transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ FRAMEWORK
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Next.js
- </div>
- </div>
-
- <div data-category="backend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-orange transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ LANGUAGE
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Java
- </div>
- </div>
-
- <div data-category="backend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-green transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ BACKEND
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Node.js
- </div>
- </div>
-
- <div data-category="frontend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-pink transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ STYLING
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Tailwind CSS
- </div>
- </div>
-
- <div data-category="backend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-purple transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ DATABASE</div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">MongoDB</div>
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ GENAI</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase text-center">LLM / GenAI</div>
  </div>
 
  <div data-category="ai"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-blue transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ LANGUAGE
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Python
- </div>
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-yellow transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ PROTOCOL</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase">MCP</div>
  </div>
 
- <div data-category="backend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-yellow transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ FRAMEWORK
+ <div data-category="ai"
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-orange transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ AGENTS</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase text-center">RAG / Agents Orchestration</div>
  </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Express.js
- </div>
+
+ <div data-category="systems"
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-green transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ ARCHITECTURE</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase text-center">System Design Guardrails</div>
  </div>
 
  <div data-category="frontend"
@@ -2759,61 +2913,51 @@
  <div class="text-white group-hover:text-black font-black font-display uppercase">Flutter</div>
  </div>
 
- <div data-category="web3"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-green transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ BLOCKCHAIN
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase text-center">Web3 / Solidity
- </div>
- </div>
-
  <div data-category="frontend"
  class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-purple transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ DESIGN
- </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase text-center">Figma (UI/UX)
- </div>
- </div>
-
- <div data-category="frontend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-green transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ 3D</div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Blender
- </div>
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ FULL STACK</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase">MERN</div>
  </div>
 
  <div data-category="ai"
  class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-blue transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
  <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ ML</div>
- <div class="text-white group-hover:text-black font-black font-display uppercase text-center">Deep Learning
- </div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase text-center">Neural Network Deep Learning</div>
  </div>
 
  <div data-category="ai"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-orange transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ NLP</div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">NLP
- </div>
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-yellow transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ FRAMEWORK</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase">LangChain</div>
  </div>
 
- <div data-category="devops"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-white transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ VERSION
+ <div data-category="ai"
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-pink transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ ORCHESTRATION</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase">LangGraph</div>
  </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">Git / GitHub
- </div>
+
+ <div data-category="ai"
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-green transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ EMBEDDINGS</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase text-center">Vector Embedding Tokenization</div>
  </div>
 
  <div data-category="backend"
- class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-pink transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
- <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ LANGUAGE
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-blue transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ LANGUAGE</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase">Python</div>
  </div>
- <div class="text-white group-hover:text-black font-black font-display uppercase">SQL</div>
+
+ <div data-category="backend"
+ class="skill-item group border-r-2 border-b-2 border-white/20 bg-neo-black hover:bg-neo-orange transition-all duration-0 hover:z-10 relative cursor-hover flex flex-col items-center justify-center">
+ <div class="section-accent group-hover:text-black font-mono text-xs mb-1 opacity-50">>_ LANGUAGE</div>
+ <div class="text-white group-hover:text-black font-black font-display uppercase">Java</div>
  </div>
  </div>
 
  <div class="skills-stats border-t-4 border-white flex flex-wrap justify-between gap-3 font-mono text-gray-500">
- <span>TOTAL_NODES: 16</span>
+ <span>TOTAL_NODES: 12</span>
  <span>PATENT_COUNT: 1</span>
  <span>HACKATHON_WINS: 10+</span>
  </div>
@@ -2836,27 +2980,28 @@
  <h3 class="log-card-title">AI Product Engineer</h3>
  <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1 shrink-0">MAY 2026 - PRESENT</span>
  </div>
- <p class="log-card-meta text-neo-purple">@ Mewayz Global Corporation | Full-time | Onsite, Kolkata</p>
+ <p class="log-card-meta text-neo-purple">@ Orcrys Technologies Pvt. Ltd. | Full-time | Hybrid</p>
  <ul class="log-card-list text-gray-800">
- <li>Working as an AI Product Engineer on the AI Product Unit - leading development of AI-powered products within the Mewayz ecosystem.</li>
- <li>Focusing on scalable system architecture, rapid deployment, and innovation aligned with platform capabilities and growth objectives.</li>
- <li>Managing and mentoring a high-performance engineering team while collaborating with cross-functional teams to deliver impactful AI solutions.</li>
+ <li>Contributing to the development of Edquate, an AI-powered learning platform within the Orcrys ecosystem.</li>
+ <li>Designing scalable AI solutions, integrating LLMs and Generative AI capabilities, and shipping production-ready features.</li>
+ <li>Collaborating with cross-functional teams to drive innovation, performance, and business growth.</li>
  </ul>
  </div>
  </div>
 
  <div class="log-timeline">
  <div class="reveal log-entry">
- <div class="log-entry-marker bg-neo-orange"></div>
+ <div class="log-entry-marker bg-neo-blue"></div>
  <div class="log-card bg-white">
  <div class="role-card-header log-card-header border-b-2 border-dashed border-black/30">
- <h3 class="log-card-title">Full Stack Developer</h3>
- <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">JUL 2026 - PRESENT</span>
+ <h3 class="log-card-title">Senior Software Engineer · Technical Lead</h3>
+ <span class="role-date-badge role-date-badge--past font-mono font-bold text-white px-2 py-1">MAY 2026 - JUL 2026</span>
  </div>
- <p class="log-card-meta text-neo-purple">@ Orcrys Technologies Pvt. Ltd. | Full-time | Kolkata</p>
+ <p class="log-card-meta text-neo-purple">@ Mewayz Global Corporation · Full-time · Kolkata, West Bengal, India · Hybrid</p>
  <ul class="log-card-list">
- <li>Building AI-powered products across the Orcrys venture ecosystem — aligned with Mewayz and Edquate.</li>
- <li>Full-stack development for enterprise AI pipelines and cloud-native digital systems.</li>
+ <li>Technical Lead Engineer on the AI Product Unit — leading development of AI-powered products within the Mewayz ecosystem.</li>
+ <li>Focused on scalable system architecture, rapid deployment, and innovation aligned with platform capabilities and growth objectives.</li>
+ <li>Managed and mentored a high-performance engineering team while collaborating with cross-functional teams to deliver impactful AI solutions.</li>
  </ul>
  </div>
  </div>
@@ -2998,7 +3143,7 @@
  <span class="role-date-badge font-mono font-bold bg-neo-black text-white px-2 py-1">OCT 2022 - AUG 2026</span>
  </div>
  <p class="log-card-meta text-neo-blue"><a href="https://tint.edu.in/" target="_blank" rel="noopener noreferrer" class="underline decoration-2 underline-offset-4 hover:bg-neo-blue hover:text-white transition-colors cursor-hover">Techno India College of Technology (MAKAUT, WB)</a></p>
- <p class="font-mono text-gray-700">4th Year CSE</p>
+ <p class="font-mono text-gray-700">B.Tech in Computer Science & Engineering (CGPA: 8.41/10)</p>
  </div>
  </div>
 
@@ -3047,11 +3192,17 @@
  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:auto-rows-fr">
  <!-- GitHub Column -->
  <div class="reveal flex flex-col h-full">
- <div class="flex items-center gap-2 mb-4 border-b border-white/20 pb-2">
+ <div class="flex items-center justify-between gap-2 mb-4 border-b border-white/20 pb-2">
+ <div class="flex items-center gap-2">
  <div class="w-8 h-8 bg-neo-green border-2 border-white flex items-center justify-center">
  <i class="ri-github-fill text-lg text-black"></i>
  </div>
  <h3 class="text-2xl font-black uppercase text-white">GITHUB</h3>
+ </div>
+ <div class="flex items-center gap-2">
+ <span id="gh-sync-status" class="font-mono text-[8px] uppercase tracking-widest text-neo-yellow">SYNCING</span>
+ <button type="button" id="gh-refresh-btn" class="font-mono text-[9px] font-bold uppercase border border-neo-green text-neo-green px-2 py-1 hover:bg-neo-green hover:text-black transition-colors" title="Refresh GitHub stats">↻</button>
+ </div>
  </div>
 
  <!-- GitHub Block -->
@@ -3158,15 +3309,25 @@
  class="border-2 border-neo-green/30 bg-neo-black/60 p-4 relative group overflow-hidden hover:border-neo-green transition-colors shadow-[4px_4px_0_rgba(51,255,87,0.1)]">
  <div
  class="text-[9px] font-mono text-neo-green mb-1 uppercase tracking-widest opacity-70">
+ Forks</div>
+ <div id="gh-forks-count" class="text-white font-black text-3xl tracking-tighter">—</div>
+ </div>
+ <div
+ class="border-2 border-neo-green/30 bg-neo-black/60 p-4 relative group overflow-hidden hover:border-neo-green transition-colors shadow-[4px_4px_0_rgba(51,255,87,0.1)]">
+ <div
+ class="text-[9px] font-mono text-neo-green mb-1 uppercase tracking-widest opacity-70">
  Joined</div>
  <div id="created-at"
  class="text-white font-black text-xl tracking-tighter mt-1 leading-none">--</div>
  </div>
  </div>
 
- <div id="gh-recent-activity" class="mb-6 border-2 border-white/20 bg-neo-black/60 p-4" aria-live="polite">
- <div class="text-[9px] font-mono text-neo-green uppercase tracking-widest opacity-70 mb-3">Recent_Pushes</div>
- <p class="font-mono text-xs text-gray-500">Loading recent repositories...</p>
+ <div id="gh-top-repos" class="mb-6 border-2 border-white/20 bg-neo-black/60 p-4" aria-live="polite">
+ <div class="text-[9px] font-mono text-neo-green uppercase tracking-widest opacity-70 mb-3 flex items-center justify-between">
+ <span>Top_Repositories</span>
+ <span class="text-gray-500">top 5 · by commits</span>
+ </div>
+ <p class="font-mono text-xs text-gray-500">Loading top repositories...</p>
  </div>
 
  <!-- Activity Graph parallel to LeetCode Heatmap -->
@@ -3201,11 +3362,17 @@
 
  <!-- LeetCode Column -->
  <div class="reveal flex flex-col h-full">
- <div class="flex items-center gap-2 mb-4 border-b border-white/20 pb-2">
+ <div class="flex items-center justify-between gap-2 mb-4 border-b border-white/20 pb-2">
+ <div class="flex items-center gap-2">
  <div class="w-8 h-8 bg-neo-orange border-2 border-white flex items-center justify-center">
  <i class="ri-code-box-fill text-lg text-black"></i>
  </div>
  <h3 class="text-2xl font-black uppercase text-white">LEETCODE</h3>
+ </div>
+ <div class="flex items-center gap-2">
+ <span id="lc-sync-status" class="font-mono text-[8px] uppercase tracking-widest text-neo-yellow">SYNCING</span>
+ <button type="button" id="lc-refresh-btn" class="font-mono text-[9px] font-bold uppercase border border-neo-orange text-neo-orange px-2 py-1 hover:bg-neo-orange hover:text-black transition-colors" title="Refresh LeetCode stats">↻</button>
+ </div>
  </div>
 
  <!-- LeetCode Block -->
@@ -3224,7 +3391,26 @@
  </div>
  <div class="text-right">
  <div id="lc-ranking" class="text-2xl font-black text-neo-orange tracking-tighter">—</div>
- <p class="text-[8px] font-mono text-gray-500 uppercase">Badges</p>
+ <p class="text-[8px] font-mono text-gray-500 uppercase">Global Rank</p>
+ </div>
+ </div>
+
+ <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 uppercase">
+ <div class="border-2 border-neo-orange/30 bg-neo-black/60 p-3">
+ <div class="text-[8px] font-mono text-neo-orange mb-1 opacity-70">Solved</div>
+ <div id="lc-total-solved" class="text-white font-black text-2xl tracking-tighter">—</div>
+ </div>
+ <div class="border-2 border-neo-orange/30 bg-neo-black/60 p-3">
+ <div class="text-[8px] font-mono text-neo-orange mb-1 opacity-70">Easy</div>
+ <div id="lc-easy-solved" class="text-white font-black text-2xl tracking-tighter">—</div>
+ </div>
+ <div class="border-2 border-neo-orange/30 bg-neo-black/60 p-3">
+ <div class="text-[8px] font-mono text-neo-orange mb-1 opacity-70">Medium</div>
+ <div id="lc-medium-solved" class="text-white font-black text-2xl tracking-tighter">—</div>
+ </div>
+ <div class="border-2 border-neo-orange/30 bg-neo-black/60 p-3">
+ <div class="text-[8px] font-mono text-neo-orange mb-1 opacity-70">Hard</div>
+ <div id="lc-hard-solved" class="text-white font-black text-2xl tracking-tighter">—</div>
  </div>
  </div>
 
@@ -3599,10 +3785,10 @@
  class="w-full text-center bg-white text-black font-black text-lg py-3 border-2 border-black shadow-hard hover:bg-neo-green hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
  <i class="ri-mail-send-line"></i> SEND EMAIL DIRECTLY
  </a>
- <a href="https://www.linkedin.com/in/yuvrajprasad/" target="_blank" rel="noopener noreferrer" data-track="book_call"
- class="w-full text-center bg-neo-black text-white font-black text-lg py-3 border-2 border-black shadow-hard hover:bg-neo-blue hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
- <i class="ri-calendar-check-line"></i> BOOK A CALL (LINKEDIN)
- </a>
+ <button type="button" id="book-call-open" data-track="book_call"
+ class="w-full text-center bg-neo-black text-white font-black text-lg py-3 border-2 border-black shadow-hard hover:bg-neo-green hover:text-black hover:translate-y-1 hover:shadow-none transition-all cursor-hover">
+ <i class="ri-calendar-check-line"></i> BOOK A CALL · ₹10 / 30 MIN
+ </button>
  </div>
  <p class="font-mono text-[10px] text-gray-500 uppercase">Messages are processed per our <a href="privacy.html" class="text-neo-blue underline hover:text-black">privacy policy</a>.</p>
  </form>
@@ -3646,7 +3832,7 @@
  <span class="bg-neo-black text-neo-yellow text-xs font-bold px-2 py-1 border-2 border-neo-yellow/40">WINS: 10+</span>
  <span class="bg-neo-black text-neo-blue text-xs font-bold px-2 py-1 border-2 border-neo-blue/40">EN | HI | BN</span>
  </div>
- <a href="Assets/Resume/Yuvraj%20Prasad%20CV.pdf" download
+ <a href="Assets/Resume/Yuvraj%20Prasad%20CV.pdf" download data-cv-download
  class="inline-flex items-center gap-2 bg-white text-black font-black text-sm px-4 py-2 border-2 border-black shadow-hard hover:bg-neo-pink hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all cursor-hover">
  <i class="ri-download-line"></i> DOWNLOAD CV
  </a>
@@ -3754,7 +3940,7 @@
 
  <div class="footer-bottom">
  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-gray-500 text-sm">
- <p><span class="copyright-mark" aria-hidden="true">&copy;</span> 2026 YUVRAJ.exe // SYSTEM_END · <span id="site-build" class="text-gray-600"></span></p>
+ <p><span class="copyright-mark" aria-hidden="true">&copy;</span> 2026 YUVRAJ.exe // SYSTEM_END · <span id="site-build" class="text-gray-600"></span> · <span class="text-gray-600">VISITORS // <span id="visitor-count" class="text-neo-green" aria-live="polite">—</span></span></p>
  <div class="flex flex-wrap items-center gap-4">
  <a href="privacy.html"
  class="text-xs font-mono font-bold text-gray-500 hover:text-neo-green transition-colors cursor-hover uppercase">
@@ -3781,7 +3967,12 @@
  </footer>
 
  <script src="Assets/js/projects-data.js" defer></script>
+ <script src="Assets/js/cv-config.js" defer></script>
+ <script src="Assets/js/contact-config.js" defer></script>
  <script src="Assets/js/main.js" defer></script>
+ <script src="Assets/js/visitors.js" defer></script>
+ <script src="Assets/js/book-call.js" defer></script>
+ <script src="Assets/js/stats.js" defer></script>
  <script src="Assets/js/premium.js" defer></script>
 </body>
 

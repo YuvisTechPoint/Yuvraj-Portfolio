@@ -17,4 +17,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:css
-      - run: npm run verify:assets
+      - run: npx playwright install chromium
+      - run: npm test

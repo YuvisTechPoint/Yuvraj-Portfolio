@@ -1,6 +1,17 @@
 {
   "buildCommand": "npm run build:css",
   "installCommand": "npm ci",
+  "functions": {
+    "api/github.js": {
+      "maxDuration": 30
+    },
+    "api/book-call.js": {
+      "maxDuration": 60
+    },
+    "api/contact.js": {
+      "maxDuration": 30
+    }
+  },
   "redirects": [
     {
       "source": "/:path*",

@@ -58,7 +58,8 @@
     function clearStatsCache() {
         try {
             Object.keys(localStorage).forEach((key) => {
-                if (key.startsWith('gh_user_cache_') || key.startsWith('lc_badges_cache_')) {
+                if (key.startsWith('gh_user_cache_') || key.startsWith('gh_stats_cache_')
+                    || key.startsWith('lc_badges_cache_') || key.startsWith('lc_stats_cache_')) {
                     localStorage.removeItem(key);
                 }
             });
@@ -90,10 +91,12 @@
         }
     }
 
+    window.ypReadCache = readCache;
+    window.ypWriteCache = writeCache;
+
     const GTM_ID = 'GTM-TLNG322R';
     let gtmLoaded = false;
     let statsApisStarted = false;
-    let githubPromise = null;
 
     cacheConsent = getStoredConsent();
 
@@ -126,16 +129,14 @@
     }
 
     function resetStatsFetchers() {
-        githubPromise = null;
-        githubReposPromise = null;
+        window.ypResetCodingStats?.();
         statsApisStarted = false;
     }
 
     function startStatsApis() {
         if (statsApisStarted) return;
         statsApisStarted = true;
-        initGitHub();
-        fetchLeetCodeBadges();
+        window.ypInitCodingStats?.();
     }
 
     function startStatsApisWhenVisible() {
@@ -158,20 +159,18 @@
     }
 
     function hydrateHeroReposFromCache() {
-        const cached = readCache(GH_CACHE_KEY);
-        if (cached?.data?.public_repos == null) return;
+        const cached = readCache(`gh_stats_cache_v2:${GITHUB_USERNAME}`) || readCache(GH_CACHE_KEY);
+        const count = cached?.data?.user?.publicRepos ?? cached?.data?.public_repos;
+        if (count == null) return;
         const el = document.getElementById('hero-repos-stat');
-        if (el) el.textContent = String(cached.data.public_repos);
+        if (el) el.textContent = String(count);
     }
 
     function prefetchHeroGitHubCount() {
         if (cacheConsent === 'decline') return;
         hydrateHeroReposFromCache();
         const run = () => {
-            fetchGitHubUser().then((data) => {
-                const el = document.getElementById('hero-repos-stat');
-                if (el && data?.public_repos != null) el.textContent = String(data.public_repos);
-            }).catch(() => {});
+            window.ypPrefetchGitHubHero?.();
         };
         if ('requestIdleCallback' in window) {
             requestIdleCallback(run, { timeout: 2500 });
@@ -325,7 +324,7 @@
     const CURSOR_HOVER = 80;
     const CURSOR_ZOOM = 2.1;
     const CURSOR_INTERACTIVE = '.cursor-hover, a, button, input, textarea, select, label, h1, h2, h3, h4, h5, h6';
-    const CURSOR_MAGNIFY_BLOCK = '#profile-flip-card, #cv-modal, #project-modal, #shortcuts-modal, #command-palette, #mobile-menu, #mobile-menu-backdrop, #page-loader, #cookie-consent';
+    const CURSOR_MAGNIFY_BLOCK = '#profile-flip-card, #cv-modal, #project-modal, #book-call-modal, #shortcuts-modal, #command-palette, #mobile-menu, #mobile-menu-backdrop, #page-loader, #cookie-consent';
 
     if (cursor && !prefersReducedMotion && !isTouchDevice && !navigator.connection?.saveData && window.innerWidth >= 1024) {
         const mirrorHost = cursor.querySelector('.cursor-mirror');
@@ -1068,6 +1067,87 @@
     window.copyContactPhone = () => copyToClipboard('+91 62911 29896', 'copy-phone-btn');
 
     const CONTACT_RECIPIENT = 'prasadyuvraj8805@gmail.com';
+    const CONTACT_API_TIMEOUT_MS = 12000;
+    const CONTACT_CFG = window.YP_CONTACT_CONFIG || {};
+    const PRODUCTION_CONTACT_API = CONTACT_CFG.productionApiUrl || 'https://yuvrajprasad.vercel.app/api/contact';
+    const PRODUCTION_CONFIG_API = CONTACT_CFG.configUrl || 'https://yuvrajprasad.vercel.app/api/config';
+
+    let cachedWeb3formsKey = CONTACT_CFG.web3formsAccessKey || '';
+
+    function usesProductionContactApi() {
+        const { protocol, hostname } = window.location;
+        return protocol === 'file:' || hostname === 'localhost' || hostname === '127.0.0.1';
+    }
+
+    function getContactApiUrl() {
+        return usesProductionContactApi() ? PRODUCTION_CONTACT_API : '/api/contact';
+    }
+
+    function getContactConfigUrl() {
+        return usesProductionContactApi() ? PRODUCTION_CONFIG_API : '/api/config';
+    }
+
+    async function fetchWithTimeout(url, options, timeoutMs = CONTACT_API_TIMEOUT_MS) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    async function loadWeb3formsKey() {
+        if (cachedWeb3formsKey) return cachedWeb3formsKey;
+
+        try {
+            const response = await fetchWithTimeout(getContactConfigUrl(), { method: 'GET' }, 8000);
+            if (!response.ok) return '';
+            const data = await response.json().catch(() => ({}));
+            cachedWeb3formsKey = data.web3formsAccessKey || '';
+        } catch {
+            cachedWeb3formsKey = '';
+        }
+
+        return cachedWeb3formsKey;
+    }
+
+    async function submitViaContactApi(payload) {
+        const response = await fetchWithTimeout(getContactApiUrl(), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (response.ok) return { ok: true };
+
+        const err = await response.json().catch(() => ({}));
+        return {
+            ok: false,
+            status: response.status,
+            error: err.error || 'Could not send message.',
+            retryable: response.status >= 500 || response.status === 503,
+        };
+    }
+
+    async function submitViaWeb3Forms(accessKey, payload) {
+        if (!accessKey) return false;
+
+        const response = await fetchWithTimeout('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+                access_key: accessKey,
+                name: payload.name,
+                email: payload.email,
+                subject: `[Portfolio] ${payload.subject} from ${payload.name}`,
+                message: `From: ${payload.name} <${payload.email}>\nSubject: ${payload.subject}\n\n${payload.message}`,
+            }),
+        }, 15000);
+
+        const data = await response.json().catch(() => ({}));
+        return response.ok && data.success === true;
+    }
 
     function showFormStatus(type, message) {
         const statusEl = document.getElementById('form-status');
@@ -1084,10 +1164,9 @@
         statusEl.className = 'font-mono text-sm font-bold hidden';
     }
 
-    function openMailtoContact({ name, email, subject, message }) {
-        const mailSubject = encodeURIComponent(`Portfolio: ${subject || 'New message'} from ${name}`);
-        const mailBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-        window.location.href = `mailto:${CONTACT_RECIPIENT}?subject=${mailSubject}&body=${mailBody}`;
+    function showContactFailure(message) {
+        showFormStatus('error', message);
+        showToast('[ ✗ FAILED ] Could not send message.', 'error');
     }
 
     const CONTACT_LIMITS = { name: 100, email: 254, subject: 120, message: 5000 };
@@ -1137,41 +1216,49 @@
             submitBtn.innerHTML = '<i class="ri-loader-4-line"></i> TRANSMITTING...';
         }
 
-        try {
-            const response = await fetch('/api/contact', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+        const deliverSuccess = () => {
+            showFormStatus('success', 'Message sent. I usually reply within 48 hours.');
+            showToast('[ ✓ SENT ] Message delivered successfully.', 'success');
+            form.reset();
+            pushGtmEvent('contact_submit');
+        };
 
-            if (response.ok) {
-                showFormStatus('success', 'Message sent. I usually reply within 48 hours.');
-                showToast('[ ✓ SENT ] Message delivered successfully.', 'success');
-                form.reset();
-                pushGtmEvent('contact_submit');
+        try {
+            const apiResult = await submitViaContactApi(payload);
+            if (apiResult.ok) {
+                deliverSuccess();
                 return false;
             }
 
-            const err = await response.json().catch(() => ({}));
-            if (response.status === 429) {
-                showFormStatus('error', err.error || 'Too many attempts. Please wait a minute.');
+            if (apiResult.status === 429) {
+                showFormStatus('error', apiResult.error || 'Too many attempts. Please wait a minute.');
                 showToast('[ ✗ RATE LIMIT ] Try again shortly.', 'error');
                 return false;
             }
 
-            if (response.status === 501) {
-                openMailtoContact(payload);
-                showFormStatus('info', 'Email service not configured here — your mail app should open. Send the message to complete contact.');
-                showToast('[ ✓ OPENING ] Use your email app to send the message.', 'info');
+            if (apiResult.status && apiResult.status < 500 && apiResult.status !== 503) {
+                showContactFailure(apiResult.error || 'Could not send message. Try the direct email link below.');
                 return false;
             }
 
-            showFormStatus('error', err.error || 'Could not send message. Try the direct email link below.');
-            showToast('[ ✗ FAILED ] Could not send message.', 'error');
+            const web3formsKey = await loadWeb3formsKey();
+            if (await submitViaWeb3Forms(web3formsKey, payload)) {
+                deliverSuccess();
+                return false;
+            }
+
+            if (usesProductionContactApi() && window.location.protocol === 'file:') {
+                showContactFailure(
+                    'Contact form cannot send from a local HTML file. Open https://yuvrajprasad.vercel.app or run npm run dev, then try again.'
+                );
+                return false;
+            }
+
+            showContactFailure(
+                'Could not deliver your message. Use SEND EMAIL DIRECTLY below or try again in a moment.'
+            );
         } catch {
-            openMailtoContact(payload);
-            showFormStatus('info', 'Network error — opening your email app as a fallback.');
-            showToast('[ ✓ OPENING ] Email app fallback.', 'info');
+            showContactFailure('Network error. Check your connection or use SEND EMAIL DIRECTLY below.');
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -1184,235 +1271,6 @@
 
     document.getElementById('contact-form')?.addEventListener('submit', submitContactForm);
     window.handleContactSubmit = submitContactForm;
-
-    /* --- GitHub (single API call for stats + badges) --- */
-    const GH_REPOS_CACHE_KEY = `gh_repos_cache_v1:${GITHUB_USERNAME}`;
-    let githubReposPromise = null;
-
-    function fetchGitHubRepos() {
-        if (!githubReposPromise) {
-            const cached = readCache(GH_REPOS_CACHE_KEY);
-            if (cached && (Date.now() - cached.ts) < CACHE_TTL_MS) {
-                githubReposPromise = Promise.resolve(cached.data);
-            } else {
-                githubReposPromise = fetch(`https://api.github.com/users/${encodeURIComponent(GITHUB_USERNAME)}/repos?per_page=100&sort=updated`, {
-                    headers: { Accept: 'application/vnd.github.v3+json' }
-                }).then(async (r) => {
-                    const json = await r.json().catch(() => []);
-                    if (!r.ok) throw new Error(`GH repos error (${r.status})`);
-                    writeCache(GH_REPOS_CACHE_KEY, json);
-                    return json;
-                }).catch((err) => {
-                    if (cached?.data) return cached.data;
-                    throw err;
-                });
-            }
-        }
-        return githubReposPromise;
-    }
-
-    function fetchGitHubUser() {
-        if (!githubPromise) {
-            const cached = readCache(GH_CACHE_KEY);
-            if (cached && (Date.now() - cached.ts) < CACHE_TTL_MS) {
-                githubPromise = Promise.resolve(cached.data);
-            } else {
-                githubPromise = fetch(`https://api.github.com/users/${encodeURIComponent(GITHUB_USERNAME)}`, {
-                    headers: { Accept: 'application/vnd.github.v3+json' }
-                }).then(async (r) => {
-                    const json = await r.json().catch(() => ({}));
-                    if (!r.ok) {
-                        const message = json?.message || `GH API error (${r.status})`;
-                        const err = new Error(message);
-                        err.status = r.status;
-                        throw err;
-                    }
-                    writeCache(GH_CACHE_KEY, json);
-                    return json;
-                }).catch((err) => {
-                    // fall back to stale cache if available
-                    if (cached?.data) return cached.data;
-                    throw err;
-                });
-            }
-        }
-        return githubPromise;
-    }
-
-    async function initGitHub() {
-        const setText = (id, val) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = val;
-        };
-        try {
-            const [data, repos] = await Promise.all([fetchGitHubUser(), fetchGitHubRepos().catch(() => [])]);
-            const repoCount = data.public_repos ?? '0';
-            setText('repos-count', repoCount);
-            setText('hero-repos-stat', repoCount);
-            setText('followers-count', data.followers ?? '0');
-            if (data.created_at) {
-                setText('created-at', new Date(data.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }));
-            }
-            const totalStars = Array.isArray(repos)
-                ? repos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0)
-                : 0;
-            setText('total-contributions', String(totalStars));
-            setText('total-contributions-grid', String(totalStars));
-
-            const statusEl = document.getElementById('gh-badges-status');
-            if (statusEl) {
-                statusEl.textContent = 'Loaded';
-                statusEl.classList.remove('animate-pulse', 'text-neo-yellow');
-                statusEl.classList.add('text-neo-green');
-            }
-
-            const activeContainer = document.getElementById('gh-active-badge');
-            if (activeContainer) {
-                const rankTitle = data.followers > 20 ? 'Star Developer' : 'Open Sourcer';
-                const iconClass = data.followers > 20 ? 'ri-star-smile-fill' : 'ri-git-repository-fill';
-                activeContainer.innerHTML = `<div class="relative w-12 h-12 mb-2 group-hover:scale-110 transition-transform"><div class="w-full h-full rounded-full border-2 border-neo-green flex items-center justify-center bg-neo-green/10"><i class="${iconClass} text-neo-green text-2xl drop-shadow-[0_0_8px_rgba(51,255,87,0.5)]"></i></div></div><span class="text-[10px] font-mono text-white text-center leading-tight max-w-[90px] truncate" title="${rankTitle}">${rankTitle}</span>`;
-            }
-
-            const historyContainer = document.getElementById('gh-history-badges');
-            if (historyContainer) {
-                const awards = [];
-                if (data.public_repos >= 10) awards.push({ name: '10+ Repos', icon: 'ri-folder-open-fill' });
-                if (data.public_repos >= 50) awards.push({ name: '50+ Repos', icon: 'ri-folder-add-fill' });
-                if (data.followers > 10) awards.push({ name: 'Popular', icon: 'ri-user-heart-fill' });
-                if (!awards.length) awards.push({ name: 'Contributor', icon: 'ri-medal-line' });
-                const repeated = [...awards, ...awards, ...awards, ...awards];
-                historyContainer.innerHTML = repeated.map((badge) =>
-                    `<div class="min-w-[70px] flex flex-col items-center group/badge"><div class="w-10 h-10 mb-2 relative group-hover/badge:-translate-y-1 transition-transform flex items-center justify-center border-2 border-white/20 rounded-full bg-white/5 shadow-[2px_2px_0_rgba(51,255,87,0.3)] hover:border-neo-green hover:shadow-[4px_4px_0_rgba(51,255,87,1)] cursor-pointer"><i class="${badge.icon} text-neo-green text-xl drop-shadow-[2px_2px_0_rgba(0,0,0,1)]"></i></div><span class="text-[9px] font-mono text-gray-300 font-bold text-center w-full truncate px-1" title="${badge.name}">${badge.name}</span></div>`
-                ).join('');
-            }
-
-            renderGitHubActivity(repos);
-        } catch (error) {
-            console.error('GitHub fetch error:', error);
-            setText('repos-count', '--');
-            setText('hero-repos-stat', '--');
-            setText('followers-count', '--');
-            setText('total-contributions', '--');
-            setText('total-contributions-grid', '--');
-            setText('created-at', '--');
-            const statusEl = document.getElementById('gh-badges-status');
-            if (statusEl) {
-                const msg = typeof error?.message === 'string' ? error.message : '';
-                statusEl.textContent = msg.toLowerCase().includes('rate limit') ? 'Rate limited' : 'Unavailable';
-                statusEl.className = 'text-neo-red text-[9px] font-mono uppercase tracking-widest';
-            }
-        }
-    }
-
-    function renderGitHubActivity(repos) {
-        const el = document.getElementById('gh-recent-activity');
-        if (!el || !Array.isArray(repos) || !repos.length) {
-            if (el) el.innerHTML = '<p class="font-mono text-xs text-gray-500">No public repositories found.</p>';
-            return;
-        }
-
-        const recent = [...repos]
-            .filter((repo) => repo && !repo.fork && repo.name)
-            .sort((a, b) => new Date(b.pushed_at || 0) - new Date(a.pushed_at || 0))
-            .slice(0, 4);
-
-        if (!recent.length) {
-            el.innerHTML = '<p class="font-mono text-xs text-gray-500">No recent activity.</p>';
-            return;
-        }
-
-        el.innerHTML = `<ul class="space-y-2">${recent.map((repo) => {
-            const pushed = repo.pushed_at
-                ? new Date(repo.pushed_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })
-                : '';
-            const lang = repo.language ? `<span class="text-neo-green/80">${repo.language}</span>` : '';
-            return `<li class="flex items-start justify-between gap-3 font-mono text-xs border-b border-white/10 pb-2 last:border-0 last:pb-0">
-                <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="text-white hover:text-neo-green transition-colors truncate" title="${repo.name}">${repo.name}</a>
-                <span class="shrink-0 text-gray-500">${pushed}${lang ? ` · ${lang}` : ''}</span>
-            </li>`;
-        }).join('')}</ul>`;
-    }
-
-    /* --- LeetCode badges --- */
-    const LC_CACHE_KEY = `lc_badges_cache_v1:${LEETCODE_USERNAME}`;
-    async function fetchLeetCodeBadges() {
-        const statusEl = document.getElementById('lc-badges-status');
-        const activeContainer = document.getElementById('lc-active-badge');
-        const historyContainer = document.getElementById('lc-history-badges');
-
-        const renderUnavailable = (label = 'Unavailable') => {
-            if (statusEl) {
-                statusEl.textContent = label;
-                statusEl.classList.remove('animate-pulse', 'text-neo-yellow', 'text-neo-red', 'text-neo-green', 'text-neo-orange');
-                statusEl.classList.add('text-neo-red');
-            }
-            if (activeContainer) {
-                activeContainer.innerHTML = '<span class="text-[10px] font-mono text-gray-500 text-center">Stats unavailable</span>';
-            }
-            if (historyContainer) {
-                historyContainer.innerHTML = '<a href="https://leetcode.com/u/' + encodeURIComponent(LEETCODE_USERNAME) + '/" target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono text-neo-orange hover:text-neo-yellow">View on LeetCode →</a>';
-            }
-        };
-
-        try {
-            const cached = readCache(LC_CACHE_KEY);
-            const isFresh = cached && (Date.now() - cached.ts) < CACHE_TTL_MS;
-
-            let data;
-            if (isFresh) {
-                data = cached.data;
-            } else {
-                const response = await fetch(`https://alfa-leetcode-api.onrender.com/${encodeURIComponent(LEETCODE_USERNAME)}/badges`);
-                if (!response.ok) throw new Error(`API Error (${response.status})`);
-                data = await response.json();
-                writeCache(LC_CACHE_KEY, data);
-            }
-
-            if (typeof data?.message === 'string' && /not\s*found/i.test(data.message)) {
-                throw new Error('User not found');
-            }
-
-            if (statusEl) {
-                statusEl.textContent = isFresh ? 'Cached' : 'Loaded';
-                statusEl.classList.remove('animate-pulse', 'text-neo-yellow', 'text-neo-red', 'text-neo-green');
-                statusEl.classList.add('text-neo-orange');
-            }
-
-            const activeBadge = data.activeBadge;
-            if (activeContainer) {
-                if (activeBadge?.displayName) {
-                    const iconUrl = activeBadge.icon.startsWith('http') ? activeBadge.icon : 'https://leetcode.com' + activeBadge.icon;
-                    activeContainer.innerHTML = `<div class="relative w-12 h-12 mb-2 group-hover:scale-110 transition-transform"><img src="${iconUrl}" alt="${activeBadge.displayName}" class="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(255,159,28,0.5)]" loading="lazy"></div><span class="text-[10px] font-mono text-white text-center leading-tight max-w-[90px] truncate" title="${activeBadge.displayName}">${activeBadge.displayName}</span>`;
-                } else {
-                    activeContainer.innerHTML = `<i class="ri-lock-2-line text-2xl mb-1 text-gray-500"></i><span class="text-[10px] font-mono text-gray-500">Locked</span>`;
-                }
-            }
-
-            const badges = data.badges || [];
-            const rankingEl = document.getElementById('lc-ranking');
-            if (rankingEl) {
-                rankingEl.textContent = badges.length ? String(badges.length) : '—';
-            }
-            if (historyContainer) {
-                if (badges.length) {
-                    const repeated = [...badges, ...badges, ...badges];
-                    historyContainer.innerHTML = repeated.map((badge) => {
-                        const iconUrl = badge.icon.startsWith('http') ? badge.icon : 'https://leetcode.com' + badge.icon;
-                        return `<div class="min-w-[70px] flex flex-col items-center group/badge"><div class="w-10 h-10 mb-2 relative group-hover/badge:-translate-y-1 transition-transform cursor-pointer border-2 border-transparent hover:border-neo-orange p-0.5 rounded shadow-[0_0_0_rgba(255,159,28,0)] hover:shadow-[2px_2px_0_rgba(255,159,28,1)]"><img src="${iconUrl}" alt="${badge.displayName}" class="w-full h-full object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,1)]" loading="lazy"></div><span class="text-[9px] font-mono text-gray-300 font-bold text-center w-full truncate px-1" title="${badge.displayName}">${badge.displayName}</span><span class="text-[8px] font-mono text-neo-orange mt-1">${badge.creationDate || ''}</span></div>`;
-                    }).join('');
-                } else {
-                    historyContainer.innerHTML = '<div class="text-[10px] font-mono text-gray-500 w-full text-center py-4">No history awards</div>';
-                }
-            }
-        } catch (error) {
-            console.error('LeetCode fetch error:', error);
-            const msg = typeof error?.message === 'string' ? error.message : '';
-            const isNotFound = msg.toLowerCase().includes('not found');
-            const rankingEl = document.getElementById('lc-ranking');
-            if (rankingEl) rankingEl.textContent = '—';
-            renderUnavailable(isNotFound ? 'User not found' : 'Unavailable');
-        }
-    }
 
     const leetCodeStatsImg = document.querySelector('img[alt="LeetCode Stats"]');
     if (leetCodeStatsImg) {
@@ -1470,8 +1328,9 @@
     const heroTypewriter = document.getElementById('hero-typewriter');
     if (heroTypewriter && !prefersReducedMotion) {
         const roles = [
-            'AI Product Engineer @ Mewayz',
-            'Full Stack Developer @ Orcrys',
+            'AI Product Engineer @ Orcrys',
+            'Building Edquate · edquate.com',
+            'Ex Tech Lead @ Mewayz',
             'Co-Founder @ KomProTech',
             'Patent Holder',
             'Hackathon Winner',
@@ -1525,20 +1384,13 @@
     const cvModalClose = document.getElementById('cv-modal-close');
     const cvModalFrame = document.getElementById('cv-modal-frame');
     const cvModalLoading = document.getElementById('cv-modal-loading');
-    const CV_PDF_PATH = 'Assets/Resume/Yuvraj%20Prasad%20CV.pdf';
-
     function getCvPdfUrl() {
-        return new URL(CV_PDF_PATH, window.location.href).href;
+        return window.YP_CV_CONFIG?.getPdfUrl?.()
+            || new URL('Assets/Resume/Yuvraj%20Prasad%20CV.pdf', window.location.href).href;
     }
 
     function getCvPreviewSrc() {
-        const pdfUrl = getCvPdfUrl();
-        if (window.location.protocol === 'file:') {
-            return pdfUrl;
-        }
-        const viewer = new URL('Assets/cv-viewer.html', window.location.href);
-        viewer.searchParams.set('src', pdfUrl);
-        return viewer.href;
+        return window.YP_CV_CONFIG?.getViewerUrl?.() || getCvPdfUrl();
     }
 
     function setCvModalLoading(visible) {
@@ -1558,11 +1410,13 @@
         setBackgroundInert(true);
         setCvModalLoading(true);
         clearTimeout(cvLoadTimer);
-        cvModalFrame.onload = () => {
+        const hideLoading = () => {
             clearTimeout(cvLoadTimer);
             setCvModalLoading(false);
         };
-        cvLoadTimer = window.setTimeout(() => setCvModalLoading(false), 8000);
+        cvModalFrame.onload = hideLoading;
+        // Native PDF iframes often skip onload — don't block the preview behind the overlay.
+        cvLoadTimer = window.setTimeout(hideLoading, 4500);
         cvModalFrame.src = getCvPreviewSrc();
         pushGtmEvent('cv_preview');
         const panel = document.getElementById('cv-modal-panel');
@@ -1693,9 +1547,9 @@
         { cmd: 'goto patent', label: 'Scroll to Patent & IP', action: () => scrollToSection('intellectual-property') },
         { cmd: 'goto contact', label: 'Scroll to Contact', action: () => scrollToSection('contact') },
         { cmd: 'goto wins', label: 'Scroll to Portfolio Wins', action: () => scrollToSection('reports') },
-        { cmd: 'download cv', label: 'Download CV', action: () => { window.location.href = 'Assets/Resume/Yuvraj%20Prasad%20CV.pdf'; pushGtmEvent('cv_download'); } },
+        { cmd: 'download cv', label: 'Download CV', action: () => { window.location.href = getCvPdfUrl(); pushGtmEvent('cv_download'); } },
         { cmd: 'preview cv', label: 'Preview CV', action: openCvModal },
-        { cmd: 'book call', label: 'Book a call on LinkedIn', action: () => { window.open('https://www.linkedin.com/in/yuvrajprasad/', '_blank', 'noopener'); pushGtmEvent('book_call'); } },
+        { cmd: 'book call', label: 'Book a call · ₹10 / 30 min', action: () => { window.ypOpenBookCall?.(); pushGtmEvent('book_call'); } },
         { cmd: 'share', label: 'Share portfolio', action: () => window.ypSharePortfolio?.() },
         { cmd: 'copy link', label: 'Copy link to current section', action: () => window.ypCopySectionLink?.() },
         { cmd: 'shortcuts', label: 'Keyboard shortcuts', action: () => window.ypOpenShortcuts?.() },

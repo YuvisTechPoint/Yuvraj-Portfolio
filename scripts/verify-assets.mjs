@@ -16,6 +16,8 @@ const required = [
     'vercel.json',
     'Assets/css/main.css',
     'Assets/js/main.js',
+    'Assets/js/cv-config.js',
+    'Assets/js/contact-config.js',
     'Assets/js/premium.js',
     'sw.js',
     'Assets/js/projects-data.js',
@@ -25,6 +27,12 @@ const required = [
     'Assets/images/Yuvraj image.webp',
     'Assets/Resume/Yuvraj Prasad CV.pdf',
     'api/contact.js',
+    'api/config.js',
+    'api/visitors.js',
+    'api/github.js',
+    'api/leetcode.js',
+    'Assets/js/stats.js',
+    'Assets/js/visitors.js',
 ];
 
 const missing = required.filter((rel) => !existsSync(join(root, rel)));
