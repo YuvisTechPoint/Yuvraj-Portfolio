@@ -209,12 +209,18 @@ npm test                 # asset checks + API + Playwright smoke tests
 ### Deploy to Vercel (production)
 
 1. Connect the repo to [Vercel](https://vercel.com).
-2. Set environment variables in the project dashboard:
-   - `RESEND_API_KEY` + `CONTACT_FROM` — recommended contact delivery (Resend)
-   - `GMAIL_USER` + `GMAIL_APP_PASSWORD` — alternative SMTP delivery to `prasadyuvraj8805@gmail.com`
-   - `WEB3FORMS_ACCESS_KEY` — browser relay fallback (get free key at [web3forms.com](https://web3forms.com))
-   - **Vercel KV** or **Upstash Redis** — live unique visitor count in the footer (`VISITOR_BASELINE` optional)
-3. Deploy. CI runs `build:css` and `verify:assets` on push to `main`.
+2. Set environment variables in the project dashboard (see `env.example`), or sync from `.env.local`:
+   - `GMAIL_USER` + `GMAIL_APP_PASSWORD` — contact + Book a Call mail (recommended)
+   - `RESEND_API_KEY` + `CONTACT_FROM` — optional Resend relay
+   - `WEB3FORMS_ACCESS_KEY` — browser relay fallback ([web3forms.com](https://web3forms.com))
+   - `BOOKING_*` — Book a Call UPI, host email, site URL
+   - **Vercel KV** or **Upstash Redis** — visitor counter + API rate limits (`KV_REST_API_URL`, `KV_REST_API_TOKEN`)
+   - `GITHUB_TOKEN` — optional, raises GitHub API limits for live stats
+   ```bash
+   npx vercel login && npx vercel link
+   npm run sync:vercel-env
+   ```
+3. Deploy. CI runs `build:css`, `verify:assets`, and full `npm test` on push to `main`.
 4. Canonical URL: [https://yuvrajprasad.vercel.app/](https://yuvrajprasad.vercel.app/)
 
 ### Premium stack (included)
@@ -224,9 +230,11 @@ npm test                 # asset checks + API + Playwright smoke tests
 | **Polish** | Boot loader, page fade-in, section-aware tab titles, print stylesheet |
 | **Share** | Web Share API + copy fallback; project deep links `#projects?project=slug` |
 | **Power user** | `Ctrl+K`, `/`, `?` shortcuts panel; expanded command palette |
-| **PWA** | `sw.js` offline shell, manifest shortcuts, installable on mobile |
-| **Performance** | Web Vitals → GTM (analytics consent); lazy consent-gated stat charts |
-| **Deploy** | `env.example`, `npm run verify:assets`, CI asset checks |
+| **PWA** | `sw.js` v3 offline shell, manifest shortcuts, installable on mobile |
+| **Book a Call** | ₹10 / 30 min UPI booking, QR, guest + host email with `.ics` invite |
+| **CV preview** | Local PDF.js viewer in modal with canvas render + download fallback |
+| **API security** | Origin-restricted `/api/config`, Redis rate limits, CORS allowlist |
+| **Deploy** | `env.example`, `npm run sync:vercel-env`, `verify:assets`, CI tests |
 
 ---
 
@@ -241,12 +249,21 @@ npm test                 # asset checks + API + Playwright smoke tests
 │   │   ├── previews/          # Project card WebP screenshots
 │   │   └── …                  # Avatar, favicon, OG banner
 │   ├── js/
-│   │   ├── main.js            # Cursor magnifier, scroll, APIs, contact
+│   │   ├── main.js            # Cursor magnifier, scroll, APIs, contact, CV modal
+│   │   ├── book-call.js       # Book a Call modal, UPI QR, booking API
+│   │   ├── cv-config.js       # CV paths + viewer URL helpers
 │   │   ├── projects-data.js   # Project cards (data-driven)
-│   │   └── premium.js         # Boot loader, SW, consent media, share
+│   │   ├── premium.js         # Boot loader, SW, consent media, share
+│   │   └── vendor/            # qrcode.min.js, pdf.min.js (CV preview)
+│   ├── cv-viewer.html         # PDF.js CV preview (iframe)
 │   └── Resume/
 ├── api/
-│   └── contact.js             # Resend email handler (Vercel serverless)
+│   ├── _lib/                  # Shared Redis, CORS, rate limiting
+│   ├── book-call.js           # Booking emails + .ics attachments
+│   ├── config.js              # Web3Forms key (origin-restricted)
+│   ├── contact.js             # Gmail / Resend contact handler
+│   ├── github.js              # Live GitHub stats
+│   └── visitors.js            # Unique visitor counter
 ├── scripts/
 │   ├── verify-assets.mjs      # Pre-deploy asset checks
 │   └── generate-project-previews.mjs

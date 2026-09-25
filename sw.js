@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yp-portfolio-v2';
+const CACHE_NAME = 'yp-portfolio-v3';
 const PRECACHE = [
     '/',
     '/index.html',
@@ -8,6 +8,15 @@ const PRECACHE = [
     '/Assets/js/main.js',
     '/Assets/js/projects-data.js',
     '/Assets/js/premium.js',
+    '/Assets/js/book-call.js',
+    '/Assets/js/stats.js',
+    '/Assets/js/visitors.js',
+    '/Assets/js/cv-config.js',
+    '/Assets/js/contact-config.js',
+    '/Assets/js/vendor/qrcode.min.js',
+    '/Assets/js/vendor/pdf.min.js',
+    '/Assets/js/vendor/pdf.worker.min.js',
+    '/Assets/cv-viewer.html',
     '/Assets/images/title_icon.png',
     '/Assets/images/favicon.svg',
     '/site.webmanifest',

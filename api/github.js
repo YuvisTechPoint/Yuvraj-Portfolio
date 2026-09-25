@@ -19,7 +19,10 @@ function githubHeaders() {
 }
 
 async function githubFetch(url) {
-    const response = await fetch(url, { headers: githubHeaders() });
+    const response = await fetch(url, {
+        headers: githubHeaders(),
+        signal: AbortSignal.timeout(12_000),
+    });
     const data = await response.json().catch(() => null);
     if (!response.ok) {
         const message = data?.message || `GitHub API error (${response.status})`;
@@ -92,6 +95,7 @@ async function fetchCommitCounts() {
         method: 'POST',
         headers,
         body: JSON.stringify({ query, variables: { login: GITHUB_USERNAME } }),
+        signal: AbortSignal.timeout(12_000),
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok || payload.errors?.length) {

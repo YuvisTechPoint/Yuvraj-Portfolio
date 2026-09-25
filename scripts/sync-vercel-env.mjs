@@ -25,6 +25,13 @@ const wanted = new Set([
     'BOOKING_SITE_URL',
     'BOOKING_UPI_ID',
     'BOOKING_HOST_EMAIL',
+    'BOOKING_HOST_NAME',
+    'GITHUB_TOKEN',
+    'KV_REST_API_URL',
+    'KV_REST_API_TOKEN',
+    'VISITOR_BASELINE',
+    'WEB3FORMS_ACCESS_KEY',
+    'ALLOWED_ORIGINS',
 ]);
 
 const defaults = {

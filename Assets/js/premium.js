@@ -330,7 +330,9 @@
         const consent = window.ypGetConsent?.();
         if (consent === 'decline') return;
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
+            const build = document.querySelector('meta[name="site-version"]')?.content || '';
+            const swUrl = build ? `/sw.js?v=${encodeURIComponent(build)}` : '/sw.js';
+            navigator.serviceWorker.register(swUrl).catch(() => {});
         });
     }
 

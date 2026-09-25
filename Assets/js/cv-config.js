@@ -1,23 +1,23 @@
 (function () {
     const CV_FILE = 'Yuvraj Prasad CV.pdf';
     const CV_RELATIVE_PATH = 'Assets/Resume/Yuvraj%20Prasad%20CV.pdf';
+    const CV_VIEWER_PATH = 'Assets/cv-viewer.html';
 
     function getCacheBust() {
-        return document.querySelector('meta[name="site-version"]')?.content || '';
+        return document.querySelector('meta[name="site-version"]')?.content || String(Date.now());
     }
 
     function getPdfUrl() {
         const url = new URL(CV_RELATIVE_PATH, window.location.href);
-        const version = getCacheBust();
-        if (version) url.searchParams.set('v', version);
+        url.searchParams.set('v', getCacheBust());
         return url.href;
     }
 
     function getViewerUrl() {
-        const viewer = new URL('Assets/cv-viewer.html', window.location.href);
-        viewer.searchParams.set('src', getPdfUrl());
-        const version = getCacheBust();
-        if (version) viewer.searchParams.set('v', version);
+        // Pass a same-origin relative PDF path (avoid double-encoding absolute URLs).
+        const viewer = new URL(CV_VIEWER_PATH, window.location.href);
+        viewer.searchParams.set('src', `/${CV_RELATIVE_PATH}`);
+        viewer.searchParams.set('v', getCacheBust());
         return viewer.href;
     }
 

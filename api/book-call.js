@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import { setCorsHeaders } from './_lib/cors.js';
+import { isRateLimited as sharedRateLimit } from './_lib/rateLimit.js';
 
 const HOST_EMAIL = process.env.BOOKING_HOST_EMAIL || process.env.GMAIL_USER || 'prasadyuvraj8805@gmail.com';
 const HOST_NAME = process.env.BOOKING_HOST_NAME || 'Yuvraj Prasad';
@@ -6,16 +8,6 @@ const UPI_ID = process.env.BOOKING_UPI_ID || 'prasadyuvraj8805-5@okicici';
 const AMOUNT = '10.00';
 const DURATION = '30 minutes';
 const SITE_URL = process.env.BOOKING_SITE_URL || 'https://yuvrajprasad.vercel.app';
-
-const ALLOWED_ORIGINS = new Set([
-    SITE_URL,
-    'https://yuvrajprasad.vercel.app',
-    'https://yuvraj-prasad.vercel.app',
-    'http://localhost:8080',
-    'http://localhost:8765',
-    'http://127.0.0.1:8080',
-    'http://127.0.0.1:8765',
-]);
 
 const LIMITS = {
     name: 100,
@@ -29,7 +21,10 @@ const LIMITS = {
 
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX = 5;
-const rateBuckets = new Map();
+
+async function isRateLimited(key) {
+    return sharedRateLimit(key, { windowMs: RATE_WINDOW_MS, max: RATE_MAX });
+}
 
 function escapeHtml(value) {
     return String(value)
@@ -53,41 +48,6 @@ function getClientIp(req) {
         return forwarded.split(',')[0].trim();
     }
     return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
-}
-
-function isRateLimited(key) {
-    const now = Date.now();
-    const bucket = rateBuckets.get(key);
-
-    if (!bucket || now - bucket.start > RATE_WINDOW_MS) {
-        rateBuckets.set(key, { start: now, count: 1 });
-        return false;
-    }
-
-    bucket.count += 1;
-    if (bucket.count > RATE_MAX) return true;
-
-    if (rateBuckets.size > 500) {
-        for (const [entryKey, entry] of rateBuckets) {
-            if (now - entry.start > RATE_WINDOW_MS) rateBuckets.delete(entryKey);
-        }
-    }
-
-    return false;
-}
-
-function resolveCorsOrigin(req) {
-    const origin = req.headers.origin || '';
-    if (origin && ALLOWED_ORIGINS.has(origin)) return origin;
-    if (process.env.VERCEL_ENV === 'production') return SITE_URL;
-    return origin || '*';
-}
-
-function setCorsHeaders(res, req) {
-    res.setHeader('Access-Control-Allow-Origin', resolveCorsOrigin(req));
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Vary', 'Origin');
 }
 
 function makeBookingRef() {
@@ -523,7 +483,7 @@ export default async function handler(req, res) {
     }
 
     const clientIp = getClientIp(req);
-    if (isRateLimited(clientIp)) {
+    if (await isRateLimited(clientIp)) {
         return sendJson(res, 429, { error: 'Too many requests. Try again in a minute.' });
     }
 
@@ -561,7 +521,7 @@ export default async function handler(req, res) {
         return sendJson(res, 400, { error: 'Invalid booking request.' });
     }
 
-    if (isRateLimited(`${clientIp}:${booking.email.toLowerCase()}`)) {
+    if (await isRateLimited(`${clientIp}:${booking.email.toLowerCase()}`)) {
         return sendJson(res, 429, { error: 'Too many attempts for this email. Try again in a minute.' });
     }
 

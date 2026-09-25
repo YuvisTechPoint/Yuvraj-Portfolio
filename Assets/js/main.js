@@ -1390,7 +1390,13 @@
     }
 
     function getCvPreviewSrc() {
-        return window.YP_CV_CONFIG?.getViewerUrl?.() || getCvPdfUrl();
+        if (window.YP_CV_CONFIG?.getViewerUrl) {
+            return window.YP_CV_CONFIG.getViewerUrl();
+        }
+        const viewer = new URL('Assets/cv-viewer.html', window.location.href);
+        viewer.searchParams.set('src', '/Assets/Resume/Yuvraj%20Prasad%20CV.pdf');
+        viewer.searchParams.set('v', document.querySelector('meta[name="site-version"]')?.content || String(Date.now()));
+        return viewer.href;
     }
 
     function setCvModalLoading(visible) {
@@ -1400,6 +1406,18 @@
     let cvLoadTimer;
     let releaseCvFocusTrap = null;
     let cvModalLastFocus = null;
+    let cvPreviewMessageHandler = null;
+
+    function hideCvModalLoading() {
+        clearTimeout(cvLoadTimer);
+        setCvModalLoading(false);
+    }
+
+    function detachCvPreviewMessageHandler() {
+        if (!cvPreviewMessageHandler) return;
+        window.removeEventListener('message', cvPreviewMessageHandler);
+        cvPreviewMessageHandler = null;
+    }
 
     function openCvModal() {
         if (!cvModal || !cvModalFrame) return;
@@ -1410,13 +1428,17 @@
         setBackgroundInert(true);
         setCvModalLoading(true);
         clearTimeout(cvLoadTimer);
-        const hideLoading = () => {
-            clearTimeout(cvLoadTimer);
-            setCvModalLoading(false);
+        detachCvPreviewMessageHandler();
+        cvModalFrame.onload = hideCvModalLoading;
+        cvPreviewMessageHandler = (event) => {
+            if (event.origin !== window.location.origin) return;
+            if (event.source !== cvModalFrame.contentWindow) return;
+            if (event.data?.type !== 'yp-cv-preview' || !event.data?.ready) return;
+            hideCvModalLoading();
         };
-        cvModalFrame.onload = hideLoading;
+        window.addEventListener('message', cvPreviewMessageHandler);
         // Native PDF iframes often skip onload — don't block the preview behind the overlay.
-        cvLoadTimer = window.setTimeout(hideLoading, 4500);
+        cvLoadTimer = window.setTimeout(hideCvModalLoading, 4500);
         cvModalFrame.src = getCvPreviewSrc();
         pushGtmEvent('cv_preview');
         const panel = document.getElementById('cv-modal-panel');
@@ -1427,6 +1449,7 @@
     function closeCvModal() {
         if (!cvModal) return;
         clearTimeout(cvLoadTimer);
+        detachCvPreviewMessageHandler();
         cvModal.classList.remove('open');
         cvModal.hidden = true;
         document.body.style.overflow = '';

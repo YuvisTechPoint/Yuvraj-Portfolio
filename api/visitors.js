@@ -1,16 +1,9 @@
-import { Redis } from '@upstash/redis';
+import { getRedis } from './_lib/redis.js';
+import { setCorsHeaders } from './_lib/cors.js';
+import { isRateLimited } from './_lib/rateLimit.js';
 
 const VISITOR_SET_KEY = 'portfolio:visitor_ids';
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 30;
-const rateBuckets = new Map();
-
-function getRedis() {
-    const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-    const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-    if (!url || !token) return null;
-    return new Redis({ url, token });
-}
+const VISITOR_CARDINALITY_KEY = 'portfolio:visitor_count';
 
 function getBaseline() {
     const value = Number(process.env.VISITOR_BASELINE || 0);
@@ -23,25 +16,6 @@ function getClientIp(req) {
         return forwarded.split(',')[0].trim();
     }
     return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
-}
-
-function isRateLimited(key) {
-    const now = Date.now();
-    const bucket = rateBuckets.get(key);
-
-    if (!bucket || now - bucket.start > RATE_WINDOW_MS) {
-        rateBuckets.set(key, { start: now, count: 1 });
-        return false;
-    }
-
-    bucket.count += 1;
-    return bucket.count > RATE_MAX;
-}
-
-function setCorsHeaders(res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 function sendJson(res, status, body) {
@@ -90,12 +64,16 @@ function sanitizeVisitorId(value) {
 }
 
 async function getVisitorCount(redis) {
+    const stored = await redis.get(VISITOR_CARDINALITY_KEY);
+    if (stored !== null && stored !== undefined) {
+        return (Number(stored) || 0) + getBaseline();
+    }
     const unique = await redis.scard(VISITOR_SET_KEY);
     return (Number(unique) || 0) + getBaseline();
 }
 
 export default async function handler(req, res) {
-    setCorsHeaders(res);
+    setCorsHeaders(res, req, 'GET, POST, OPTIONS');
 
     if (req.method === 'OPTIONS') {
         return res.status(204).end();
@@ -110,6 +88,14 @@ export default async function handler(req, res) {
         return sendJson(res, 200, { count: null, configured: false });
     }
 
+    const clientIp = getClientIp(req);
+    const rateKey = req.method === 'GET' ? `visitors:get:${clientIp}` : `visitors:post:${clientIp}`;
+    const rateMax = req.method === 'GET' ? 60 : 30;
+
+    if (await isRateLimited(rateKey, { max: rateMax })) {
+        return sendJson(res, 429, { error: 'Too many requests' });
+    }
+
     if (req.method === 'GET') {
         try {
             const count = await getVisitorCount(redis);
@@ -118,11 +104,6 @@ export default async function handler(req, res) {
             console.error('Visitors GET error:', error);
             return sendJson(res, 500, { error: 'Could not load visitor count' });
         }
-    }
-
-    const clientIp = getClientIp(req);
-    if (isRateLimited(clientIp)) {
-        return sendJson(res, 429, { error: 'Too many requests' });
     }
 
     let payload;
@@ -139,6 +120,9 @@ export default async function handler(req, res) {
 
     try {
         const added = await redis.sadd(VISITOR_SET_KEY, visitorId);
+        if (added === 1) {
+            await redis.incr(VISITOR_CARDINALITY_KEY);
+        }
         const count = await getVisitorCount(redis);
         return sendJson(res, 200, {
             count,

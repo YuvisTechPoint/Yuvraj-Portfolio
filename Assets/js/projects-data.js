@@ -296,7 +296,7 @@
                 : `data-shot-src="${p.previewUrl || p.live || ''}"`;
             return `<div class="project-live-preview block bg-black border-2 border-black aspect-video relative overflow-hidden mb-6 group-hover:shadow-none transition-all${p.previewImage ? ' is-loaded' : ''}">
  <div class="project-preview-placeholder absolute inset-0 flex items-center justify-center bg-neo-blue/30 font-mono text-white text-sm uppercase z-0">${p.title} Preview</div>
- <img ${imgAttrs} alt="${p.title} preview" class="project-preview-shot absolute inset-0 w-full h-full object-cover object-top border-0 z-[2] pointer-events-none" decoding="async"${p.previewImage ? '' : ' loading="lazy"'}>
+ <img ${imgAttrs} alt="${p.title} preview" class="project-preview-shot absolute inset-0 w-full h-full object-cover object-top border-0 z-[2] pointer-events-none" decoding="async" loading="lazy">
  ${livePreviewChrome(p)}
  </div>`;
         }

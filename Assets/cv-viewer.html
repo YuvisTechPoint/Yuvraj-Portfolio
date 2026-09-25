@@ -6,7 +6,12 @@
   <title>CV Preview</title>
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; background: #525252; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #525252;
+      overflow: hidden;
+    }
     #toolbar {
       display: flex;
       align-items: center;
@@ -18,6 +23,7 @@
       font-family: "JetBrains Mono", monospace;
       font-size: 0.75rem;
       color: #fff;
+      height: 2.5rem;
     }
     #toolbar[hidden] { display: none; }
     #toolbar button {
@@ -36,6 +42,10 @@
       padding: 1rem;
       text-align: center;
     }
+    #viewport.full {
+      height: 100%;
+      padding: 0;
+    }
     #canvas {
       max-width: 100%;
       height: auto;
@@ -43,14 +53,19 @@
       box-shadow: 4px 4px 0 #000;
       background: #fff;
     }
-    #pdf-object,
-    #pdf-embed {
-      width: min(100%, 52rem);
-      height: calc(100vh - 5rem);
-      min-height: 28rem;
-      border: 2px solid #000;
-      box-shadow: 4px 4px 0 #000;
+    #pdf-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
       background: #fff;
+    }
+    /* ID rules beat the UA [hidden] style — force real hide so no blank scroll page */
+    #status[hidden],
+    #canvas[hidden],
+    #pdf-frame[hidden],
+    #toolbar[hidden] {
+      display: none !important;
     }
     #status {
       color: #fff;
@@ -71,109 +86,145 @@
   <div id="viewport">
     <p id="status">LOADING CV...</p>
     <canvas id="canvas" hidden></canvas>
-    <object id="pdf-object" type="application/pdf" hidden></object>
-    <embed id="pdf-embed" type="application/pdf" hidden>
+    <iframe id="pdf-frame" title="Resume PDF" hidden></iframe>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="/Assets/js/vendor/pdf.min.js"></script>
   <script>
     (function () {
       'use strict';
 
-      const params = new URLSearchParams(window.location.search);
-      const defaultPdf = new URL('Resume/Yuvraj%20Prasad%20CV.pdf', window.location.href).href;
+      var DEFAULT_PDF = '/Assets/Resume/Yuvraj%20Prasad%20CV.pdf';
+      var params = new URLSearchParams(window.location.search);
+
+      function notifyParent(state) {
+        if (window.parent === window) return;
+        try {
+          window.parent.postMessage({ type: 'yp-cv-preview', ...state }, window.location.origin);
+        } catch (_) { /* ignore */ }
+      }
 
       function resolvePdfUrl(raw) {
-        if (!raw) return defaultPdf;
-        let url;
+        var candidate = raw || DEFAULT_PDF;
+        var url;
         try {
-          url = new URL(raw, window.location.href);
-        } catch {
-          return null;
+          url = new URL(candidate, window.location.origin);
+        } catch (_) {
+          return new URL(DEFAULT_PDF, window.location.origin).href;
         }
-        if (url.protocol !== 'http:' && url.protocol !== 'https:' && url.protocol !== 'file:') return null;
-        if (url.origin !== window.location.origin) return null;
-        const path = decodeURIComponent(url.pathname).replace(/\\/g, '/').toLowerCase();
-        if (!path.includes('/assets/resume/') && !path.includes('/resume/')) return null;
-        if (!path.endsWith('.pdf')) return null;
+
+        if (url.protocol !== 'http:' && url.protocol !== 'https:' && url.protocol !== 'file:') {
+          return new URL(DEFAULT_PDF, window.location.origin).href;
+        }
+
+        // Keep same-origin only when not file://
+        if (url.protocol !== 'file:' && url.origin !== window.location.origin) {
+          return new URL(DEFAULT_PDF, window.location.origin).href;
+        }
+
+        var path = decodeURIComponent(url.pathname).replace(/\\/g, '/').toLowerCase();
+        if (path.indexOf('/assets/resume/') === -1 && path.indexOf('/resume/') === -1) {
+          return new URL(DEFAULT_PDF, window.location.origin).href;
+        }
+        if (!path.endsWith('.pdf')) {
+          return new URL(DEFAULT_PDF, window.location.origin).href;
+        }
         return url.href;
       }
 
-      const pdfUrl = resolvePdfUrl(params.get('src'));
-      const canvas = document.getElementById('canvas');
-      const objectEl = document.getElementById('pdf-object');
-      const embed = document.getElementById('pdf-embed');
-      const statusEl = document.getElementById('status');
-      const toolbar = document.getElementById('toolbar');
-      const pageInfo = document.getElementById('page-info');
-      const prevBtn = document.getElementById('prev-btn');
-      const nextBtn = document.getElementById('next-btn');
-      const ctx = canvas.getContext('2d');
-      let pdfDoc = null;
-      let pageNum = 1;
+      var pdfUrl = resolvePdfUrl(params.get('src'));
+      var canvas = document.getElementById('canvas');
+      var frame = document.getElementById('pdf-frame');
+      var statusEl = document.getElementById('status');
+      var toolbar = document.getElementById('toolbar');
+      var viewport = document.getElementById('viewport');
+      var pageInfo = document.getElementById('page-info');
+      var prevBtn = document.getElementById('prev-btn');
+      var nextBtn = document.getElementById('next-btn');
+      var ctx = canvas.getContext('2d', { alpha: false });
+      var pdfDoc = null;
+      var pageNum = 1;
 
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-      function hideNativeFallbacks() {
-        objectEl.hidden = true;
-        embed.hidden = true;
+      if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/Assets/js/vendor/pdf.worker.min.js';
       }
 
       function showError(message) {
         statusEl.hidden = false;
-        statusEl.innerHTML = message + '<br><a href="' + pdfUrl + '" download>Download CV</a>';
+        statusEl.innerHTML = message + '<br><a href="' + pdfUrl + '" target="_blank" rel="noopener">Open / Download CV</a>';
         toolbar.hidden = true;
         canvas.hidden = true;
-        hideNativeFallbacks();
+        frame.hidden = true;
+        viewport.classList.remove('full');
+        notifyParent({ ready: false, mode: 'error' });
       }
 
-      function showNativeFallback() {
+      function showIframeFallback() {
         statusEl.hidden = true;
         toolbar.hidden = true;
         canvas.hidden = true;
-        objectEl.hidden = false;
-        objectEl.data = pdfUrl + '#view=FitH&toolbar=0&navpanes=0';
-        embed.hidden = true;
-        embed.src = pdfUrl + '#view=FitH&toolbar=0&navpanes=0';
+        viewport.classList.add('full');
+        frame.hidden = false;
+        frame.src = pdfUrl + '#view=FitH&toolbar=1&navpanes=0';
+        notifyParent({ ready: true, mode: 'iframe' });
+      }
+
+      function canvasLooksEmpty() {
+        try {
+          var sample = ctx.getImageData(0, 0, Math.min(canvas.width, 40), Math.min(canvas.height, 40)).data;
+          for (var i = 0; i < sample.length; i += 16) {
+            if (sample[i] < 248 || sample[i + 1] < 248 || sample[i + 2] < 248) return false;
+          }
+          return true;
+        } catch (_) {
+          return false;
+        }
       }
 
       function renderPage(num) {
         return pdfDoc.getPage(num).then(function (page) {
-          const viewport = page.getViewport({ scale: 1.5 });
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          return page.render({ canvasContext: ctx, viewport: viewport }).promise;
+          var base = page.getViewport({ scale: 1 });
+          var targetWidth = Math.min(900, Math.max(320, viewport.clientWidth - 32 || 800));
+          var scale = targetWidth / base.width;
+          var viewportPage = page.getViewport({ scale: scale });
+          canvas.width = Math.floor(viewportPage.width);
+          canvas.height = Math.floor(viewportPage.height);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          return page.render({ canvasContext: ctx, viewport: viewportPage }).promise;
         }).then(function () {
+          if (canvasLooksEmpty()) {
+            throw new Error('Blank canvas render');
+          }
           pageInfo.textContent = num + ' / ' + pdfDoc.numPages;
           prevBtn.disabled = num <= 1;
           nextBtn.disabled = num >= pdfDoc.numPages;
           statusEl.hidden = true;
           toolbar.hidden = false;
           canvas.hidden = false;
-          hideNativeFallbacks();
+          frame.hidden = true;
+          viewport.classList.remove('full');
+          notifyParent({ ready: true, mode: 'canvas' });
         });
       }
 
       prevBtn.addEventListener('click', function () {
         if (pageNum <= 1) return;
         pageNum -= 1;
-        renderPage(pageNum).catch(showNativeFallback);
+        renderPage(pageNum).catch(showIframeFallback);
       });
 
       nextBtn.addEventListener('click', function () {
         if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
         pageNum += 1;
-        renderPage(pageNum).catch(showNativeFallback);
+        renderPage(pageNum).catch(showIframeFallback);
       });
 
-      if (!pdfUrl) {
-        showError('Invalid CV preview source.');
-        return;
-      }
-
       function loadWithPdfJs(buffer) {
-        const source = buffer
-          ? { data: buffer, disableStream: true, disableAutoFetch: true, isEvalSupported: false }
+        if (typeof pdfjsLib === 'undefined') {
+          return Promise.reject(new Error('PDF.js missing'));
+        }
+        var source = buffer
+          ? { data: new Uint8Array(buffer), disableStream: true, disableAutoFetch: true, isEvalSupported: false }
           : { url: pdfUrl, disableStream: true, disableAutoFetch: true, isEvalSupported: false };
 
         return pdfjsLib.getDocument(source).promise.then(function (pdf) {
@@ -182,20 +233,36 @@
         });
       }
 
-      fetch(pdfUrl, { cache: 'no-store' })
-        .then(function (response) {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.arrayBuffer();
-        })
-        .then(function (buffer) {
-          return loadWithPdfJs(buffer);
-        })
-        .catch(function () {
-          return loadWithPdfJs(null);
-        })
-        .catch(function () {
-          showNativeFallback();
-        });
+      function boot() {
+        fetch(pdfUrl, { cache: 'no-store' })
+          .then(function (response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            var type = (response.headers.get('content-type') || '').toLowerCase();
+            if (type && type.indexOf('pdf') === -1 && type.indexOf('octet-stream') === -1) {
+              throw new Error('Unexpected content-type: ' + type);
+            }
+            return response.arrayBuffer();
+          })
+          .then(function (buffer) {
+            if (!buffer || buffer.byteLength < 5) throw new Error('Empty PDF');
+            var header = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 5)));
+            if (header !== '%PDF-') throw new Error('Not a PDF');
+            return loadWithPdfJs(buffer);
+          })
+          .catch(function () {
+            return loadWithPdfJs(null);
+          })
+          .catch(function () {
+            showIframeFallback();
+          });
+      }
+
+      if (!pdfUrl) {
+        showError('Invalid CV preview source.');
+        return;
+      }
+
+      boot();
     })();
   </script>
 </body>

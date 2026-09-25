@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
+import { setCorsHeaders } from './_lib/cors.js';
+import { isRateLimited } from './_lib/rateLimit.js';
 
-const CONTACT_TO = 'prasadyuvraj8805@gmail.com';
+const CONTACT_TO = process.env.CONTACT_TO || process.env.GMAIL_USER || 'prasadyuvraj8805@gmail.com';
 
 const LIMITS = {
     name: 100,
@@ -8,10 +10,6 @@ const LIMITS = {
     subject: 120,
     message: 5000,
 };
-
-const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 5;
-const rateBuckets = new Map();
 
 function escapeHtml(value) {
     return String(value)
@@ -35,33 +33,6 @@ function getClientIp(req) {
         return forwarded.split(',')[0].trim();
     }
     return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
-}
-
-function isRateLimited(key) {
-    const now = Date.now();
-    const bucket = rateBuckets.get(key);
-
-    if (!bucket || now - bucket.start > RATE_WINDOW_MS) {
-        rateBuckets.set(key, { start: now, count: 1 });
-        return false;
-    }
-
-    bucket.count += 1;
-    if (bucket.count > RATE_MAX) return true;
-
-    if (rateBuckets.size > 500) {
-        for (const [entryKey, entry] of rateBuckets) {
-            if (now - entry.start > RATE_WINDOW_MS) rateBuckets.delete(entryKey);
-        }
-    }
-
-    return false;
-}
-
-function setCorsHeaders(res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 function sendJson(res, status, body) {
@@ -179,7 +150,7 @@ async function sendViaGmail({ name, email, subject, message }) {
 }
 
 export default async function handler(req, res) {
-    setCorsHeaders(res);
+    setCorsHeaders(res, req);
 
     if (req.method === 'OPTIONS') {
         res.setHeader('Allow', 'POST, OPTIONS');
@@ -201,7 +172,7 @@ export default async function handler(req, res) {
     }
 
     const clientIp = getClientIp(req);
-    if (isRateLimited(clientIp)) {
+    if (await isRateLimited(clientIp, { max: 5 })) {
         return sendJson(res, 429, { error: 'Too many requests. Try again in a minute.' });
     }
 
@@ -235,7 +206,7 @@ export default async function handler(req, res) {
         return sendJson(res, 400, { error: 'Invalid email address' });
     }
 
-    if (isRateLimited(`${clientIp}:${email.toLowerCase()}`)) {
+    if (await isRateLimited(`${clientIp}:${email.toLowerCase()}`, { max: 5 })) {
         return sendJson(res, 429, { error: 'Too many attempts for this email. Try again in a minute.' });
     }
 
