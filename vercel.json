@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build:css",
-  "outputDirectory": ".",
+  "buildCommand": "npm run build:css && node scripts/vercel-prepare-public.mjs",
+  "outputDirectory": "public",
   "redirects": [
     {
       "source": "/:path*",

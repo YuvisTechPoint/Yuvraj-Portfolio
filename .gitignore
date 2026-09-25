@@ -17,6 +17,7 @@ node_modules/
 cv-test.png
 .dist/
 build/
+public/
 
 # SEO & Search Console
 google*.html

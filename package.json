@@ -1,10 +1,11 @@
 {
   "name": "yuvraj-portfolio",
-  "version": "2026.09.9",
+  "version": "2026.09.10",
   "private": true,
   "scripts": {
-    "build": "npm run build:css",
+    "build": "npm run build:css && node scripts/vercel-prepare-public.mjs",
     "build:css": "tailwindcss -i ./Assets/css/input.css -o ./Assets/css/main.css --minify",
+    "build:vercel": "npm run build",
     "watch:css": "tailwindcss -i ./Assets/css/input.css -o ./Assets/css/main.css --watch",
     "dev": "npx --yes serve . -p 8080",
     "optimize:images": "node scripts/optimize-images.mjs",
