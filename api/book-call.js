@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
-import { setCorsHeaders } from './_lib/cors.js';
-import { isRateLimited as sharedRateLimit } from './_lib/rateLimit.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { isRateLimited as sharedRateLimit } from '../lib/rateLimit.js';
 
 const HOST_EMAIL = process.env.BOOKING_HOST_EMAIL || process.env.GMAIL_USER || 'prasadyuvraj8805@gmail.com';
 const HOST_NAME = process.env.BOOKING_HOST_NAME || 'Yuvraj Prasad';

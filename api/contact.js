@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
-import { setCorsHeaders } from './_lib/cors.js';
-import { isRateLimited } from './_lib/rateLimit.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { isRateLimited } from '../lib/rateLimit.js';
 
 const CONTACT_TO = process.env.CONTACT_TO || process.env.GMAIL_USER || 'prasadyuvraj8805@gmail.com';
 

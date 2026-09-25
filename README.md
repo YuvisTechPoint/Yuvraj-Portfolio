@@ -257,8 +257,11 @@ npm test                 # asset checks + API + Playwright smoke tests
 │   │   └── vendor/            # qrcode.min.js, pdf.min.js (CV preview)
 │   ├── cv-viewer.html         # PDF.js CV preview (iframe)
 │   └── Resume/
+├── lib/                       # Shared Redis, CORS, rate limiting (not API routes)
+│   ├── cors.js
+│   ├── rateLimit.js
+│   └── redis.js
 ├── api/
-│   ├── _lib/                  # Shared Redis, CORS, rate limiting
 │   ├── book-call.js           # Booking emails + .ics attachments
 │   ├── config.js              # Web3Forms key (origin-restricted)
 │   ├── contact.js             # Gmail / Resend contact handler

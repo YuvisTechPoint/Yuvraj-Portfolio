@@ -1,4 +1,4 @@
-import { setCorsHeaders, isAllowedOrigin } from './_lib/cors.js';
+import { setCorsHeaders, isAllowedOrigin } from '../lib/cors.js';
 
 export default function handler(req, res) {
     setCorsHeaders(res, req, 'GET, OPTIONS');

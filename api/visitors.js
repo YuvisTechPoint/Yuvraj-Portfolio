@@ -1,6 +1,6 @@
-import { getRedis } from './_lib/redis.js';
-import { setCorsHeaders } from './_lib/cors.js';
-import { isRateLimited } from './_lib/rateLimit.js';
+import { getRedis } from '../lib/redis.js';
+import { setCorsHeaders } from '../lib/cors.js';
+import { isRateLimited } from '../lib/rateLimit.js';
 
 const VISITOR_SET_KEY = 'portfolio:visitor_ids';
 const VISITOR_CARDINALITY_KEY = 'portfolio:visitor_count';
