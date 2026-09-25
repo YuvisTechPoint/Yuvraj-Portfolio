@@ -1,15 +1,12 @@
 {
   "buildCommand": "npm run build:css",
-  "installCommand": "npm ci",
+  "installCommand": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm ci",
   "functions": {
-    "api/github.js": {
+    "api/**/*.js": {
       "maxDuration": 30
     },
     "api/book-call.js": {
       "maxDuration": 60
-    },
-    "api/contact.js": {
-      "maxDuration": 30
     }
   },
   "redirects": [
