@@ -91,7 +91,7 @@ async function fetchLeetCodeBadges(username) {
     }
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
     if (req.method !== 'GET') {
         return sendJson(res, 405, { error: 'Method not allowed' });
     }
@@ -125,3 +125,5 @@ export default async function handler(req, res) {
         return sendJson(res, 502, { error: error.message || 'LeetCode stats unavailable' });
     }
 }
+
+module.exports = handler;

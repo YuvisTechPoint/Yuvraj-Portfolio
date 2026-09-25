@@ -1,6 +1,6 @@
-import { getRedis } from '../lib/redis.js';
-import { setCorsHeaders } from '../lib/cors.js';
-import { isRateLimited } from '../lib/rateLimit.js';
+const { getRedis } = require('../lib/redis.js');
+const { setCorsHeaders } = require('../lib/cors.js');
+const { isRateLimited } = require('../lib/rateLimit.js');
 
 const VISITOR_SET_KEY = 'portfolio:visitor_ids';
 const VISITOR_CARDINALITY_KEY = 'portfolio:visitor_count';
@@ -72,7 +72,7 @@ async function getVisitorCount(redis) {
     return (Number(unique) || 0) + getBaseline();
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
     setCorsHeaders(res, req, 'GET, POST, OPTIONS');
 
     if (req.method === 'OPTIONS') {
@@ -134,3 +134,5 @@ export default async function handler(req, res) {
         return sendJson(res, 500, { error: 'Could not record visit' });
     }
 }
+
+module.exports = handler;

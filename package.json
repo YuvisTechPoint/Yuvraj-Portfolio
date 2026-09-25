@@ -1,8 +1,7 @@
 {
   "name": "yuvraj-portfolio",
-  "version": "2026.09.7",
+  "version": "2026.09.8",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "npm run build:css",
     "build:css": "tailwindcss -i ./Assets/css/input.css -o ./Assets/css/main.css --minify",

@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import { setCorsHeaders } from '../lib/cors.js';
-import { isRateLimited } from '../lib/rateLimit.js';
+const nodemailer = require('nodemailer');
+const { setCorsHeaders } = require('../lib/cors.js');
+const { isRateLimited } = require('../lib/rateLimit.js');
 
 const CONTACT_TO = process.env.CONTACT_TO || process.env.GMAIL_USER || 'prasadyuvraj8805@gmail.com';
 
@@ -149,7 +149,7 @@ async function sendViaGmail({ name, email, subject, message }) {
     return true;
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
     setCorsHeaders(res, req);
 
     if (req.method === 'OPTIONS') {
@@ -238,3 +238,5 @@ export default async function handler(req, res) {
         return sendJson(res, 500, { error: 'Failed to send message' });
     }
 }
+
+module.exports = handler;

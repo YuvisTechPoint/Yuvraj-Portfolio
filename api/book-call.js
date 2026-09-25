@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
-import { setCorsHeaders } from '../lib/cors.js';
-import { isRateLimited as sharedRateLimit } from '../lib/rateLimit.js';
+const nodemailer = require('nodemailer');
+const { setCorsHeaders } = require('../lib/cors.js');
+const { isRateLimited: sharedRateLimit } = require('../lib/rateLimit.js');
 
 const HOST_EMAIL = process.env.BOOKING_HOST_EMAIL || process.env.GMAIL_USER || 'prasadyuvraj8805@gmail.com';
 const HOST_NAME = process.env.BOOKING_HOST_NAME || 'Yuvraj Prasad';
@@ -435,7 +435,7 @@ async function deliverMail(mail) {
     return null;
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
     setCorsHeaders(res, req);
 
     if (req.method === 'OPTIONS') {
@@ -574,3 +574,5 @@ export default async function handler(req, res) {
         return sendJson(res, 500, { error: 'Failed to send booking emails' });
     }
 }
+
+module.exports = handler;

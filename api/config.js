@@ -1,6 +1,6 @@
-import { setCorsHeaders, isAllowedOrigin } from '../lib/cors.js';
+const { setCorsHeaders, isAllowedOrigin } = require('../lib/cors.js');
 
-export default function handler(req, res) {
+function handler(req, res) {
     setCorsHeaders(res, req, 'GET, OPTIONS');
 
     if (req.method === 'OPTIONS') {
@@ -23,3 +23,5 @@ export default function handler(req, res) {
         web3formsAccessKey: process.env.WEB3FORMS_ACCESS_KEY || '',
     });
 }
+
+module.exports = handler;

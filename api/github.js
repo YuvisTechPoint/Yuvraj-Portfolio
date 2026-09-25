@@ -190,7 +190,7 @@ function buildPayload(user, repos, commitCounts = new Map()) {
     };
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
     if (req.method !== 'GET') {
         return sendJson(res, 405, { error: 'Method not allowed' });
     }
@@ -219,3 +219,5 @@ export default async function handler(req, res) {
         return sendJson(res, status, { error: error.message || 'GitHub stats unavailable' });
     }
 }
+
+module.exports = handler;
